@@ -1,0 +1,77 @@
+Note: Unnecessary use of -X or --request, GET is already inferred.
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying 104.26.12.42:443...
+* TCP_NODELAY set
+* Connected to api.embeddables.com (104.26.12.42) port 443 (#0)
+* ALPN, offering h2
+* ALPN, offering http/1.1
+* successfully set certificate verify locations:
+*   CAfile: /etc/ssl/certs/ca-certificates.crt
+  CApath: /etc/ssl/certs
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [19 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2542 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [79 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [52 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [52 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384
+* ALPN, server accepted to use h2
+* Server certificate:
+*  subject: CN=embeddables.com
+*  start date: Jul 28 00:03:37 2025 GMT
+*  expire date: Oct 26 01:03:36 2025 GMT
+*  subjectAltName: host "api.embeddables.com" matched cert's "*.embeddables.com"
+*  issuer: C=US; O=Google Trust Services; CN=WE1
+*  SSL certificate verify ok.
+* Using HTTP2, server supports multi-use
+* Connection state changed (HTTP/2 confirmed)
+* Copying HTTP/2 data in stream buffer to connection buffer after upgrade: len=0
+} [5 bytes data]
+* Using Stream ID: 1 (easy handle 0x559aa3fdab60)
+} [5 bytes data]
+> GET /projects/pr_vxEInhfyhdcUwzNl/entries?limit=1 HTTP/2
+> Host: api.embeddables.com
+> user-agent: curl/7.68.0
+> accept: */*
+> x-api-key: rk_bbccfbbc1304468fa03a04664b18912a
+> 
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [230 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [230 bytes data]
+* old SSL session ID is stale, removing
+{ [5 bytes data]
+* Connection state changed (MAX_CONCURRENT_STREAMS == 100)!
+} [5 bytes data]
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0< HTTP/2 200 
+< date: Thu, 04 Sep 2025 03:55:55 GMT
+< content-type: application/json; charset=utf-8
+< content-length: 1248
+< access-control-allow-origin: *
+< etag: W/"4e0-0Nh51yydP8FIYB52ZtSWO4A7ZDo"
+< nel: {"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}
+< report-to: {"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=ZDNuqJ8qVnw4N%2B%2FdXIQ0Q7KYA7WnPumD9JpwePrJnQ4%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1756958153"}],"max_age":3600}
+< reporting-endpoints: heroku-nel="https://nel.heroku.com/reports?s=ZDNuqJ8qVnw4N%2B%2FdXIQ0Q7KYA7WnPumD9JpwePrJnQ4%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1756958153"
+< server: cloudflare
+< via: 1.1 heroku-router
+< x-powered-by: Express
+< cf-cache-status: DYNAMIC
+< cf-ray: 979a8dc798c8219c-GDL
+< 
+{ [5 bytes data]
+100  1248  100  1248    0     0    489      0  0:00:02  0:00:02 --:--:--   489
+* Connection #0 to host api.embeddables.com left intact
+[{"entry_id":"entry_hedgi602g6jdej79iei8e18c2","group_id":"org_mjsuTSL8E0ZlNrDf","project_id":"pr_vxEInhfyhdcUwzNl","embeddable_id":"flow_2bc58aj3a8g0d9ddd8j7jbd4g","contact_id":"contact_7b47ejjcc01dd2b13cc5fec352","created_at":"2025-09-04T03:54:01.418Z","updated_at":"2025-09-04T03:54:01.418Z","entry_data":"{\"height_feet\":\"feet_three\",\"height_inches\":\"inches_zero\",\"product\":\"product_1\",\"products_switch\":\"type_1\",\"clicked_email_terms_conditions_checkbox\":false,\"ip_address\":\"2601:147:4900:435b:f8ac:edd3:279e:1d64\",\"current_page_id\":\"page_0233062066\",\"entryId\":\"entry_hedgi602g6jdej79iei8e18c2\",\"_prefilled\":{},\"current_page_index\":0,\"current_page_key\":\"current_height_and_weight\",\"highest_page_reached_id\":\"page_0233062066\",\"highest_page_reached_key\":\"current_height_and_weight\",\"highest_page_reached_index\":0,\"_has_analytics\":false,\"bmi\":\"0\",\"age\":55,\"stripe_line_items\":[{\"price\":\"price_123abc\",\"quantity\":1}],\"male_regular_time_steps\":{\"step1\":0,\"step2\":null,\"step3\":null,\"step4\":null,\"step5\":null},\"male_faster_time_steps\":{\"step1\":0,\"step2\":null,\"step3\":null,\"step4\":null,\"step5\":null},\"dob_day\":\"1\",\"dob_month\":\"jan\",\"dob_year\":\"1970\"}"}]

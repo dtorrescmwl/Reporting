@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(./run_all_extractions.sh:*)",
+      "Bash(dos2unix:*)",
+      "Bash(sed:*)",
+      "Bash(./extract_funnel_data.sh:*)",
+      "Bash(./analyze_json_structure.sh:*)",
+      "Bash(./create_funnel_comparison.sh:*)",
+      "Bash(./extract_data_mappings.sh:*)",
+      "Bash(./create_final_summary.sh:*)",
+      "Bash(./analyze_reporting_ecosystem.sh:*)",
+      "Bash(./deep_analysis_check.sh:*)",
+      "Bash(./create_comprehensive_docs.sh:*)",
+      "Bash(./verify_actual_reporting.sh:*)",
+      "Bash(python3:*)",
+      "Bash(pip3 install:*)",
+      "Bash(tree:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
