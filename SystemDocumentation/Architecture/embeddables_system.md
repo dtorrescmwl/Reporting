@@ -136,3 +136,96 @@ Many fields store arrays of selected options as JSON strings:
 - Forward-only progression tracking
 - Prevents duplicate entries from back navigation
 - Maintains highest page reached for analytics
+
+## Data Extraction System
+
+### Multi-Funnel Extraction Script
+**Location**: `/home/cmwldaniel/Reporting/embeddables_multi_funnel_extractor.py`
+
+#### Recent Updates (September 2025)
+- **Fixed Historical Data Limitation**: Resolved pagination issue that previously limited data extraction to entries from August 26th forward
+- **Enhanced Pagination Strategy**: Implemented aggressive time-based windowing to ensure complete historical dataset retrieval
+- **Automatic Test Filtering**: Added real-time filtering system to exclude test entries during extraction
+- **Improved Error Handling**: Enhanced robustness for large dataset processing
+- **Increased Default Limits**: Raised from 5,000 to 10,000 entries per funnel
+
+#### Key Features
+- **Complete Historical Coverage**: Now extracts ALL entries back to the beginning of each funnel
+  - Medication V1: Back to May 15, 2025 (290+ entries)
+  - Tirzepatide V1: Back to July 13, 2025 (186+ entries)  
+  - Semaglutide V1: Back to July 21, 2025 (93+ entries)
+- **Environment Variable Configuration**: Uses `.env` file for secure credential management
+- **Multi-Format Output**: Generates all/complete/partial CSV files automatically
+- **Real-Time Statistics**: Provides funnel drop-off analysis and completion rates
+
+### Test Entry Filtering System
+
+#### Test Entry Exclusion
+**Location**: `/home/cmwldaniel/Reporting/test_entries_exclusion.txt`
+
+The system automatically filters out test entries to ensure clean reporting data:
+
+##### Identified Test Patterns
+- **Obvious Test Names**: "test", "fake", "dummy", placeholder names
+- **Internal Test Users**: Daniel Torres, Daniel Gomez, Lisa Connelly, Richard Lee
+- **CMWL Internal Emails**: webhook testing, @cmwl.com addresses
+- **Suspicious Data**: Extreme measurements (3'0" heights), placeholder values
+
+##### Current Test Entry Count
+- **Total Excluded**: 30 test entry IDs across all funnels
+- **Medication V1**: 14 test entries identified
+- **Tirzepatide V1**: 11 test entries identified
+- **Semaglutide V1**: 5 test entries identified
+
+##### Automatic Filtering Process
+1. **Load Exclusion List**: Script automatically loads test IDs on startup
+2. **Real-Time Filtering**: Entries filtered during processing, before CSV export
+3. **Reporting**: System reports number of filtered entries for transparency
+4. **Maintenance**: Exclusion list can be updated as new test patterns emerge
+
+#### Data Quality Assurance
+- **Historical Cleanup**: All existing data files cleaned of test entries (60+ records removed)
+- **Future Protection**: All new extractions automatically exclude test entries
+- **Audit Trail**: Filtering activity logged during each extraction
+- **Accuracy**: Clean datasets ensure accurate funnel analysis and conversion reporting
+
+### Environment Configuration
+**Location**: `/home/cmwldaniel/Reporting/.env`
+
+```bash
+# Embeddables API Configuration
+EMBEDDABLES_API_KEY=rk_bbccfbbc1304468fa03a04664b18912a
+EMBEDDABLES_PROJECT_ID=pr_vxEInhfyhdcUwzNl
+
+# Funnel Embeddable IDs (Verified)
+MEDICATION_V1_ID=flow_2bc58aj3a8g0d9ddd8j7jbd4g
+TIRZEPATIDE_V1_ID=flow_8gd24ah717hhh9h6gjf38h58h
+SEMAGLUTIDE_V1_ID=flow_cc5fj2bciie5ecf1a2bg398865
+
+# Output Directory
+OUTPUT_DIR=/home/cmwldaniel/Reporting/Embeddables/Data
+```
+
+### Usage Examples
+
+#### Extract All Funnels
+```bash
+python3 embeddables_multi_funnel_extractor.py
+```
+
+#### Extract Specific Funnel
+```bash
+python3 embeddables_multi_funnel_extractor.py --funnel medication_v1
+```
+
+#### Extract Complete Submissions Only
+```bash
+python3 embeddables_multi_funnel_extractor.py --checkout-only
+```
+
+### Output Files
+Generated files follow naming convention: `{funnel}_{YYYYMMDD_HHMMSS}_{type}.csv`
+
+- **All Entries**: Complete dataset including partial submissions
+- **Complete Entries**: Only submissions reaching checkout page
+- **Partial Entries**: Incomplete submissions for drop-off analysis
