@@ -1,0 +1,42 @@
+# Test Entry Exclusion List
+# This file contains entry IDs that should be excluded from reporting
+# Format: entry_id (one per line)
+# Last updated: 2025-09-06
+
+# Medication V1 Funnel Test Entries
+entry_7c01e0035febe6655jj0iib2
+entry_1f2h503bb9fjicichejefff9i
+entry_934a902hae1ge90fgi2a714h1f
+entry_985d3g33e3f19f4cb1i1d65706
+entry_32f5b3964d9dhf40hdfbh7c2a
+entry_j1466e64h7b5ffj47c08ehj28
+entry_03i5b8d0347b1c5b92af71b06i3
+entry_4echia62jd0ec2e0f2j48jf3d5
+entry_cg19j084ici90j7885c08i5ca
+entry_b6ifea7i6728a79jaj24b1jf
+entry_6957j09g6815ejc9jad309h1
+entry_dihdedgbb2979fdi6ajb5ca2jf
+entry_0ge9i1a7019e6b19dhhf17gdd
+
+# Tirzepatide V1 Funnel Test Entries  
+entry_69fd3d409hi9b114j8d62b6j6
+entry_4e0fcdgb79ajiiibe49g045ih
+entry_5bej9gc72fbf5g98g7ag3a2a7e
+entry_9deed0g0ha9cj5f478jh9687c
+entry_2f711bcab9hjia6213d3e1a59
+entry_gh5606h223d8a83fe0604g30ac
+entry_5a14b52ha30bb9124b4i6fj37
+entry_59h8ee0h3c8eghdecea6gdjdaf
+entry_5fh2ij9ii9g34iegadee0aje5
+entry_hh4a3cghia7aff8f26j7e5d42
+entry_i681ae14gef9j1b2c13g7b506
+
+# Semaglutide V1 Funnel Test Entries
+entry_ee1i69g11a5ef2i5jbci94ei7
+entry_1gdf1j2d9d6ieg0385eii58i8d
+entry_g5383076e3gc9d5fh28g56g89
+entry_1a0dh29fidb0750c9a59g108eb
+entry_bbbecj6b227gc404b49f4029e
+
+# Additional suspicious entries with extreme physical measurements
+entry_gf185h21a7g778g3dj4i6h01f

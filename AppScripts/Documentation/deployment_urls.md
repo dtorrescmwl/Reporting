@@ -17,7 +17,32 @@ This document contains all Google Apps Script web app deployment URLs for easy r
 - **Trigger**: CarePortals order.created webhook
 - **Status**: ✅ Active
 
-### [Add other CarePortals scripts as they are deployed]
+### database_careportals_subscriptions.js
+- **Web App URL**: https://script.google.com/macros/s/AKfycbwYTF1Vgiw98yfD7foWq-F5urkwaZ0kyasl5Rzx2_GpOvGsXQf_ch1GmOaAp27EfUQ5OA/exec
+- **Google Sheets**: Database CarePortals spreadsheet (subscription tabs)
+- **Purpose**: Comprehensive subscription lifecycle management
+- **Triggers**: subscription.created, subscription.active, subscription.paused, subscription.cancelled
+- **URL Parameters**: ?trigger=active, ?trigger=paused, ?trigger=cancelled
+- **Status**: ✅ Active
+- **Tabs Created**: subscription.active, subscription.paused, subscription.cancelled, subscription.full_log
+
+### cancelled_subscriptions.js
+- **Web App URL**: https://script.google.com/macros/s/AKfycbynH6kOFmrPrKpmRFG6-msEKkCyyADmukF5rvL3hUX4bo70u9IvJLMwJfG8Wq94oH9T8g/exec
+- **Purpose**: Legacy subscription cancellation handling  
+- **Trigger**: CarePortals subscription.cancelled webhook
+- **Status**: ⚠️ Superseded by database_careportals_subscriptions.js
+
+### prescription_created.js
+- **Web App URL**: https://script.google.com/macros/s/AKfycby_CuNffi6UibPIDLwMI23iYWq3N1_GbLPLUtJFKCD2j8qWAMiJwcauU63mDWZ7AZY/exec
+- **Purpose**: Prescription creation event processing
+- **Trigger**: CarePortals prescription.created webhook
+- **Status**: ✅ Active
+
+### new_orders_created.js
+- **Web App URL**: https://script.google.com/macros/s/AKfycbwOaZ1ts8Cktwj6opB5Dyxcr8461Cry5tWt3pKFT1E_PYPGqcM4mb9L9-hk-F3RLL2h/exec
+- **Purpose**: New order creation event processing
+- **Trigger**: CarePortals order.created webhook  
+- **Status**: ✅ Active
 
 ## 🔗 Embeddables Scripts
 

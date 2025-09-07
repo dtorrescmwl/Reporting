@@ -5,13 +5,18 @@ Welcome to the complete reporting and automation system. This index provides a c
 ## 🗂️ Directory Structure
 
 ```
-New_Structure/
+Reporting/
 ├── 📜 AppScripts/           # All Google Apps Scripts
-├── 🏥 CarePortals/          # CarePortals EMR/CRM system
-├── 🔗 Embeddables/          # Embeddable forms and tools
-├── 📊 GoogleSheets/         # Live sheets with real data
+├── 🏥 CarePortals/          # CarePortals EMR/CRM system data
+├── 🔗 Embeddables/          # Embeddable forms data and CSV exports
+├── 📊 GoogleSheets/         # Live sheets with real data (updated daily)
 ├── 🗂️ SystemDocumentation/  # Technical documentation
-└── 🔧 Tools/               # Utilities and processors
+├── 🔧 Scripts/              # Organized automation scripts
+│   ├── Embeddables/         # Data extraction and filtering
+│   ├── DataProcessing/      # Analysis utilities
+│   └── Utilities/           # System maintenance
+├── 📋 Archive/              # Historical files and backups
+└── 📝 New_Spreadsheets/     # Latest downloads (temp directory)
 ```
 
 ## 📜 AppScripts
@@ -22,7 +27,8 @@ New_Structure/
 ### 🏥 CarePortals Scripts
 - `customer_support_order_tracking.js` - Real-time order tracking for customer support
 - `database_orders.js` - Order processing and database normalization
-- `cancelled_subscriptions.js` - Subscription cancellation handling
+- `database_careportals_subscriptions.js` - ✅ **PRODUCTION** Comprehensive subscription lifecycle management
+- `cancelled_subscriptions.js` - Subscription cancellation handling (legacy)
 - `prescription_created.js` - Prescription creation processing
 - `new_orders_created.js` - New order creation handling
 
@@ -47,9 +53,13 @@ New_Structure/
 - **Documentation** (`/Documentation/`) - System-specific guides
 
 ### Key Files
-- `customer_support_order_tracking.json` - Our new automation
+- `customer_support_order_tracking.json` - Order tracking automation
+- `active_subscription_to_sheets.json` - ✅ Active subscription automation
+- `created_subscription_to_sheets.json` - ✅ Created subscription automation  
+- `paused_subscription_to_sheets.json` - ✅ Paused subscription automation
+- `cancelled_subscription_to_sheets.json` - ✅ Cancelled subscription automation
 - `careportals_orders_original.csv` - Source data  
-- `Customer_Support.xlsx` - Template for new implementations
+- `Customer_Support.xlsx` - Template for implementations
 
 ## 🔗 Embeddables System
 
@@ -67,13 +77,29 @@ New_Structure/
 **Location**: `/GoogleSheets/`  
 **Index**: `/GoogleSheets/INDEX.md`
 
-### Live Sheets with Real Data
-- `CarePortals_Orders.xlsx` - Main order processing data
-- `Database_CarePortals.xlsx` - Normalized database structure
-- `Customer_Support.xlsx` - **Our new customer support system**  
+### Live Sheets with Real Data (Updated September 6, 2025)
+- `CarePortals_Orders.xlsx` - ✅ **UPDATED** Main order processing data
+- `Database_CarePortals.xlsx` - ✅ **UPDATED** Normalized database structure  
+- `Customer_Support.xlsx` - ✅ **NEW** Customer support system
   - **URL**: https://docs.google.com/spreadsheets/d/1h-ttn7R6s2KszovW_NvBI1x6fVUaXAjcID6-Xa0ISsw/edit
   - **Web App**: https://script.google.com/macros/s/AKfycbxci3zpOxCyTHRLh47aje0nx9HrAUSvRFflDV8Kz8TSK1Ogst5w0Y_A-65xQMTOTsupdQ/exec
-- `Embeddables.xlsx` - Form submission tracking
+- `Embeddables.xlsx` - ✅ **UPDATED** Form submission tracking
+- `order_tracking_system.xlsx` - Order tracking system data
+
+## 🔧 Scripts & Automation
+
+**Location**: `/Scripts/`  
+**README**: `/Scripts/README.md`
+
+### Embeddables Data Extraction
+- **Main Extractor**: `Scripts/Embeddables/embeddables_multi_funnel_extractor.py`
+- **Test Filtering**: `Scripts/Embeddables/test_entries_exclusion.txt` (30+ filtered entries)
+- **Usage**: Automated daily/weekly data extraction with clean, filtered results
+
+### Data Processing & Analysis
+- **Data Examination**: `Scripts/DataProcessing/examine_submissions_data.py`
+- **Notebook Updates**: `Scripts/Utilities/update_notebook_data_sources.py`
+- **Quality Assurance**: Automatic test entry filtering during processing
 
 ## 🗂️ System Documentation
 

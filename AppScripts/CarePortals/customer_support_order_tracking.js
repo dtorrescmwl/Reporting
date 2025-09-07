@@ -70,6 +70,56 @@ function lookupProductName(spreadsheet, productId) {
   }
 }
 
+// Helper function to ensure customer is in customer dictionary
+function ensureCustomerInDictionary(spreadsheet, customerId, customerName) {
+  try {
+    console.log(`Checking customer dictionary for ID: ${customerId}, Name: ${customerName}`);
+    
+    if (!customerId || customerId === 'N/A' || !customerName || customerName === 'N/A') {
+      console.log('No valid customer ID or name provided, skipping dictionary update');
+      return false;
+    }
+    
+    // Get or create customer_dictionary sheet
+    let sheet = spreadsheet.getSheetByName('customer_dictionary');
+    if (!sheet) {
+      console.log('Creating customer_dictionary sheet');
+      sheet = spreadsheet.insertSheet('customer_dictionary');
+      // Add headers
+      sheet.appendRow(['Customer ID', 'Customer Name']);
+      console.log('Added headers to customer_dictionary sheet');
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    if (data.length <= 1) {
+      console.log('Customer dictionary sheet is empty, adding first customer');
+      sheet.appendRow([customerId, customerName]);
+      console.log(`Added customer: ${customerId} - ${customerName}`);
+      return true;
+    }
+    
+    // Check if customer already exists (skip header row)
+    for (let i = 1; i < data.length; i++) {
+      const rowCustomerId = String(data[i][0]); // Column A (customer ID)
+      
+      if (rowCustomerId === String(customerId)) {
+        console.log(`Customer ${customerId} already exists in dictionary`);
+        return false; // Already exists, no action needed
+      }
+    }
+    
+    // Customer not found, add new entry
+    console.log(`Customer ${customerId} not found, adding to dictionary`);
+    sheet.appendRow([customerId, customerName]);
+    console.log(`Added new customer: ${customerId} - ${customerName}`);
+    return true;
+    
+  } catch (error) {
+    console.error('Error managing customer dictionary:', error);
+    return false;
+  }
+}
+
 function doPost(e) {
   try {
     console.log('=== WEBHOOK RECEIVED ===');
@@ -104,6 +154,14 @@ function processOrderUpdate(orderData) {
     // Extract order information with new fields
     const orderInfo = extractOrderInfo(orderData, spreadsheet);
     console.log('Extracted order info:', JSON.stringify(orderInfo, null, 2));
+    
+    // Ensure customer is in customer dictionary
+    console.log('Updating customer dictionary...');
+    const customerId = orderData['customer._id'];
+    const firstName = orderData['customer.firstName'] || '';
+    const lastName = orderData['customer.lastName'] || '';
+    const customerName = `${firstName} ${lastName}`.trim();
+    ensureCustomerInDictionary(spreadsheet, customerId, customerName);
     
     // Always add to full_log
     console.log('Adding to full_log...');

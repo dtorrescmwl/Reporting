@@ -37,6 +37,34 @@ This directory contains all Google Apps Scripts organized by system and purpose.
 - **Web App URL**: https://script.google.com/macros/s/AKfycbwOaZ1ts8Cktwj6opB5Dyxcr8461Cry5tWt3pKFT1E_PYPGqcM4mb9L9-hk-F3RLL2h/exec
 - **Trigger**: CarePortals order.created webhook
 
+### database_careportals_subscriptions.js ✅ PRODUCTION READY
+- **Purpose**: Comprehensive subscription lifecycle management
+- **Spreadsheet**: Database CarePortals
+- **Web App URL**: https://script.google.com/macros/s/AKfycbwYTF1Vgiw98yfD7foWq-F5urkwaZ0kyasl5Rzx2_GpOvGsXQf_ch1GmOaAp27EfUQ5OA/exec
+- **Triggers**: CarePortals subscription.created, subscription.active, subscription.paused, subscription.cancelled webhooks
+- **URL Parameters**: ?trigger=active, ?trigger=paused, ?trigger=cancelled
+- **CarePortals Automations**: 4 active webhooks across 2 automations (dual webhook setup)
+- **Features**: 
+  - Routes subscriptions to status-specific tabs (subscription.active, subscription.paused, subscription.cancelled)
+  - Maintains subscription.full_log for complete audit trail
+  - Removes duplicates across status tabs
+  - Eastern Time conversion for all timestamps
+  - **Product ID extraction**: Uses `data["product._id"]` to handle complex product objects
+  - **Error handling**: Comprehensive error logging with Subscription_Errors sheet
+
+### messages_log_customer_support.js 🔄 PENDING DEPLOYMENT
+- **Purpose**: Message logging for customer support communication tracking
+- **Spreadsheet**: Customer_Support
+- **Web App URL**: *TBD - Awaiting deployment*
+- **Trigger**: CarePortals message.inbound webhook
+- **Features**: 
+  - Logs messages to messages.log tab in Customer_Support spreadsheet
+  - Dual customer field support (customer and customer._id)
+  - Customer name lookup from customer_dictionary tab
+  - EMR Profile link generation
+  - Eastern Time conversion for timestamps
+  - Auto-creates messages.log tab with proper headers
+
 ## 🔗 Embeddables Scripts
 
 ### medication_v1_form_submissions.js

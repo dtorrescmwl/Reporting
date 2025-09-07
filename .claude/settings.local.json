@@ -18,7 +18,11 @@
       "Bash(./verify_actual_reporting.sh:*)",
       "Bash(python3:*)",
       "Bash(pip3 install:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

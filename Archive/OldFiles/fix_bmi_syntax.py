@@ -1,0 +1,213 @@
+#!/usr/bin/env python3
+"""
+Fix the syntax error in the BMI function by properly handling newlines
+"""
+import json
+
+# Read the notebook
+with open('/home/cmwldaniel/Reporting/Healthcare_Reporting_Dashboard.ipynb', 'r') as f:
+    notebook = json.load(f)
+
+# Find the cell with the analyze_medical_qualifications function
+target_cell_index = None
+for i, cell in enumerate(notebook['cells']):
+    if cell.get('cell_type') == 'code' and 'source' in cell:
+        source_content = ''.join(cell['source'])
+        if 'def analyze_medical_qualifications(dfs):' in source_content:
+            target_cell_index = i
+            break
+
+if target_cell_index is not None:
+    print(f"Found target cell at index {target_cell_index}")
+    
+    # Create the corrected function with proper newlines
+    new_source_lines = [
+        "# Medical Qualification Analysis\n",
+        "def analyze_medical_qualifications(dfs):\n",
+        "    print(\"🏥 Medical Qualification Analysis\")\n",
+        "    print(\"=\" * 35)\n",
+        "    \n",
+        "    if 'submissions' not in dfs:\n",
+        "        print(\"❌ Missing submissions data for medical analysis\")\n",
+        "        return None\n",
+        "        \n",
+        "    df = dfs['submissions']\n",
+        "    print(f\"📊 Analyzing {len(df):,} form submissions\")\n",
+        "    \n",
+        "    results = {}\n",
+        "    \n",
+        "    # BMI Analysis - Corrected to find the actual BMI column\n",
+        "    print(f\"\\n🔍 Looking for BMI column...\")\n",
+        "    \n",
+        "    # Find the exact BMI column (not partial matches like 'Submission' containing 'bmi')\n",
+        "    bmi_col = None\n",
+        "    for col in df.columns:\n",
+        "        if col.strip().lower() == 'bmi':\n",
+        "            bmi_col = col\n",
+        "            break\n",
+        "    \n",
+        "    if bmi_col:\n",
+        "        print(f\"  ✅ Found BMI column: '{bmi_col}'\")\n",
+        "        bmi_data = pd.to_numeric(df[bmi_col], errors='coerce')\n",
+        "        bmi_clean = bmi_data.dropna()\n",
+        "        \n",
+        "        if len(bmi_clean) > 0:\n",
+        "            print(f\"\\n📏 BMI Analysis ({len(bmi_clean):,} records):\")\n",
+        "            print(f\"  Average BMI: {bmi_clean.mean():.1f}\")\n",
+        "            print(f\"  Median BMI: {bmi_clean.median():.1f}\")\n",
+        "            print(f\"  BMI Range: {bmi_clean.min():.1f} - {bmi_clean.max():.1f}\")\n",
+        "            \n",
+        "            # BMI Categories\n",
+        "            bmi_categories = pd.cut(bmi_clean, \n",
+        "                                  bins=[0, 18.5, 25, 30, 35, 40, 100],\n",
+        "                                  labels=['Underweight', 'Normal', 'Overweight', 'Obese I', 'Obese II', 'Obese III'])\n",
+        "            \n",
+        "            bmi_dist = bmi_categories.value_counts()\n",
+        "            print(\"\\n  📊 BMI Distribution:\")\n",
+        "            for category, count in bmi_dist.items():\n",
+        "                pct = (count / len(bmi_clean)) * 100\n",
+        "                print(f\"    {category}: {count:,} ({pct:.1f}%)\")\n",
+        "                \n",
+        "            results['bmi_analysis'] = {\n",
+        "                'mean': bmi_clean.mean(),\n",
+        "                'median': bmi_clean.median(),\n",
+        "                'distribution': bmi_dist,\n",
+        "                'total_records': len(bmi_clean)\n",
+        "            }\n",
+        "    else:\n",
+        "        print(\"  ❌ No exact 'BMI' column found\")\n",
+        "        \n",
+        "        # Fallback: try to calculate BMI from Height and Weight\n",
+        "        height_col = None\n",
+        "        weight_col = None\n",
+        "        \n",
+        "        # Find Height column\n",
+        "        for col in df.columns:\n",
+        "            if col.strip().lower() == 'height':\n",
+        "                height_col = col\n",
+        "                break\n",
+        "        \n",
+        "        # Find Weight column (prefer \"Weight at Submission\")\n",
+        "        for col in df.columns:\n",
+        "            if 'weight at submission' in col.lower():\n",
+        "                weight_col = col\n",
+        "                break\n",
+        "        \n",
+        "        if height_col and weight_col:\n",
+        "            print(f\"  🔄 Calculating BMI from '{height_col}' and '{weight_col}'\")\n",
+        "            \n",
+        "            # Process height data (format like \"5'4''\")\n",
+        "            height_series = df[height_col]\n",
+        "            height_inches = []\n",
+        "            \n",
+        "            for h in height_series:\n",
+        "                if pd.notna(h) and isinstance(h, str):\n",
+        "                    try:\n",
+        "                        # Parse format like \"5'4''\"\n",
+        "                        parts = h.replace(\"''\", \"\").split(\"'\")\n",
+        "                        if len(parts) == 2:\n",
+        "                            feet = int(parts[0])\n",
+        "                            inches = int(parts[1]) if parts[1] else 0\n",
+        "                            total_inches = feet * 12 + inches\n",
+        "                            height_inches.append(total_inches)\n",
+        "                        else:\n",
+        "                            height_inches.append(None)\n",
+        "                    except:\n",
+        "                        height_inches.append(None)\n",
+        "                else:\n",
+        "                    height_inches.append(None)\n",
+        "            \n",
+        "            # Convert to pandas series\n",
+        "            height_inches_series = pd.Series(height_inches)\n",
+        "            weight_lbs = pd.to_numeric(df[weight_col], errors='coerce')\n",
+        "            \n",
+        "            # Calculate BMI: (weight in lbs) / (height in inches)^2 * 703\n",
+        "            calculated_bmi = (weight_lbs / (height_inches_series ** 2)) * 703\n",
+        "            calculated_bmi_clean = calculated_bmi.dropna()\n",
+        "            \n",
+        "            if len(calculated_bmi_clean) > 0:\n",
+        "                print(f\"\\n📏 Calculated BMI Analysis ({len(calculated_bmi_clean):,} records):\")\n",
+        "                print(f\"  Average BMI: {calculated_bmi_clean.mean():.1f}\")\n",
+        "                print(f\"  Median BMI: {calculated_bmi_clean.median():.1f}\")\n",
+        "                print(f\"  BMI Range: {calculated_bmi_clean.min():.1f} - {calculated_bmi_clean.max():.1f}\")\n",
+        "                \n",
+        "                results['bmi_analysis'] = {\n",
+        "                    'mean': calculated_bmi_clean.mean(),\n",
+        "                    'median': calculated_bmi_clean.median(),\n",
+        "                    'total_records': len(calculated_bmi_clean),\n",
+        "                    'source': 'calculated'\n",
+        "                }\n",
+        "        else:\n",
+        "            print(\"  ❌ Cannot calculate BMI: missing height or weight columns\")\n",
+        "    \n",
+        "    # Age Analysis\n",
+        "    age_col = None\n",
+        "    for col in df.columns:\n",
+        "        if 'age at submission' in col.lower():\n",
+        "            age_col = col\n",
+        "            break\n",
+        "    \n",
+        "    if age_col:\n",
+        "        age_data = pd.to_numeric(df[age_col], errors='coerce')\n",
+        "        age_clean = age_data.dropna()\n",
+        "        \n",
+        "        if len(age_clean) > 0:\n",
+        "            print(f\"\\n📅 Age Analysis ({len(age_clean):,} records):\")\n",
+        "            print(f\"  Average Age: {age_clean.mean():.1f} years\")\n",
+        "            print(f\"  Median Age: {age_clean.median():.1f} years\")\n",
+        "            print(f\"  Age Range: {age_clean.min():.0f} - {age_clean.max():.0f} years\")\n",
+        "            \n",
+        "            # Age groups\n",
+        "            age_groups = pd.cut(age_clean, \n",
+        "                              bins=[0, 18, 25, 35, 45, 55, 65, 100],\n",
+        "                              labels=['<18', '18-24', '25-34', '35-44', '45-54', '55-64', '65+'])\n",
+        "            \n",
+        "            age_dist = age_groups.value_counts()\n",
+        "            print(\"\\n  📊 Age Distribution:\")\n",
+        "            for group, count in age_dist.items():\n",
+        "                pct = (count / len(age_clean)) * 100\n",
+        "                print(f\"    {group}: {count:,} ({pct:.1f}%)\")\n",
+        "                \n",
+        "            results['age_analysis'] = {\n",
+        "                'mean': age_clean.mean(),\n",
+        "                'median': age_clean.median(),\n",
+        "                'distribution': age_dist\n",
+        "            }\n",
+        "    \n",
+        "    # Gender Analysis\n",
+        "    gender_col = None\n",
+        "    for col in df.columns:\n",
+        "        if 'sex assigned at birth' in col.lower():\n",
+        "            gender_col = col\n",
+        "            break\n",
+        "    \n",
+        "    if gender_col:\n",
+        "        print(f\"\\n⚧ Gender Analysis:\")\n",
+        "        gender_dist = df[gender_col].value_counts()\n",
+        "        \n",
+        "        for gender, count in gender_dist.items():\n",
+        "            pct = (count / len(df)) * 100\n",
+        "            print(f\"  {gender}: {count:,} ({pct:.1f}%)\")\n",
+        "        \n",
+        "        results['gender_analysis'] = gender_dist\n",
+        "    \n",
+        "    return results\n",
+        "\n",
+        "# Call the analysis\n",
+        "medical_results = analyze_medical_qualifications(main_dfs)\n"
+    ]
+    
+    # Update the cell with properly formatted source lines
+    notebook['cells'][target_cell_index]['source'] = new_source_lines
+    
+    # Write the updated notebook back
+    with open('/home/cmwldaniel/Reporting/Healthcare_Reporting_Dashboard.ipynb', 'w') as f:
+        json.dump(notebook, f, indent=1)
+    
+    print("✅ Successfully fixed the syntax error in BMI function")
+    print("  - Removed problematic \\n characters")
+    print("  - Used proper newlines in notebook format")
+    print("  - Fixed string escaping issues")
+
+else:
+    print("❌ Could not find the analyze_medical_qualifications function")

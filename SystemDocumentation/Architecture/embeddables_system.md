@@ -140,7 +140,7 @@ Many fields store arrays of selected options as JSON strings:
 ## Data Extraction System
 
 ### Multi-Funnel Extraction Script
-**Location**: `/home/cmwldaniel/Reporting/embeddables_multi_funnel_extractor.py`
+**Location**: `/home/cmwldaniel/Reporting/Scripts/Embeddables/embeddables_multi_funnel_extractor.py`
 
 #### Recent Updates (September 2025)
 - **Fixed Historical Data Limitation**: Resolved pagination issue that previously limited data extraction to entries from August 26th forward
@@ -161,7 +161,7 @@ Many fields store arrays of selected options as JSON strings:
 ### Test Entry Filtering System
 
 #### Test Entry Exclusion
-**Location**: `/home/cmwldaniel/Reporting/test_entries_exclusion.txt`
+**Location**: `/home/cmwldaniel/Reporting/Scripts/Embeddables/test_entries_exclusion.txt`
 
 The system automatically filters out test entries to ensure clean reporting data:
 
@@ -210,17 +210,17 @@ OUTPUT_DIR=/home/cmwldaniel/Reporting/Embeddables/Data
 
 #### Extract All Funnels
 ```bash
-python3 embeddables_multi_funnel_extractor.py
+python3 Scripts/Embeddables/embeddables_multi_funnel_extractor.py
 ```
 
 #### Extract Specific Funnel
 ```bash
-python3 embeddables_multi_funnel_extractor.py --funnel medication_v1
+python3 Scripts/Embeddables/embeddables_multi_funnel_extractor.py --funnel medication_v1
 ```
 
 #### Extract Complete Submissions Only
 ```bash
-python3 embeddables_multi_funnel_extractor.py --checkout-only
+python3 Scripts/Embeddables/embeddables_multi_funnel_extractor.py --checkout-only
 ```
 
 ### Output Files
