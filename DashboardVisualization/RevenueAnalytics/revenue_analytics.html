@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revenue Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        .date-selector {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .date-selector h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .date-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .date-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .date-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .date-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .custom-date-range {
+            display: none;
+            margin-top: 15px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 10px;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .custom-date-range.active {
+            display: flex;
+        }
+
+        .custom-date-range input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .custom-date-range button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .metric-change {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+        .neutral { color: #6b7280; }
+
+        .revenue-card .metric-value { color: #10b981; }
+        .refunds-card .metric-value { color: #ef4444; }
+        .net-revenue-card .metric-value { color: #3b82f6; }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .charts-grid.single-chart {
+            grid-template-columns: 1fr;
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .analysis-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .insight-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .insight-item:last-child {
+            border-bottom: none;
+        }
+
+        .insight-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .insight-value {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .date-buttons {
+                flex-direction: column;
+            }
+
+            .custom-date-range {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-card {
+                min-width: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Revenue Analytics Dashboard</h1>
+            <p>Comprehensive revenue analysis with order-payment integration and deep refund insights</p>
+        </div>
+
+        <div class="date-selector">
+            <h3>📅 Select Time Period</h3>
+            <div class="date-buttons">
+                <button class="date-btn active" data-period="yesterday">Yesterday</button>
+                <button class="date-btn" data-period="weekly">This Week</button>
+                <button class="date-btn" data-period="monthly">This Month</button>
+                <button class="date-btn" data-period="all-time">All Time</button>
+                <button class="date-btn" data-period="custom">Custom Range</button>
+            </div>
+            <div class="custom-date-range">
+                <label>From:</label>
+                <input type="date" id="start-date">
+                <label>To:</label>
+                <input type="date" id="end-date">
+                <button onclick="applyCustomRange()">Apply</button>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            🔄 Loading revenue analytics data...
+        </div>
+
+        <div id="dashboard-content" style="display: none;">
+            <!-- Key Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card revenue-card">
+                    <div class="metric-value" id="gross-revenue">$0</div>
+                    <div class="metric-label">Gross Revenue</div>
+                    <div class="metric-change" id="gross-revenue-change"></div>
+                </div>
+                <div class="metric-card refunds-card">
+                    <div class="metric-value" id="total-refunds">$0</div>
+                    <div class="metric-label">Total Refunds</div>
+                    <div class="metric-change" id="refunds-change"></div>
+                </div>
+                <div class="metric-card net-revenue-card">
+                    <div class="metric-value" id="net-revenue">$0</div>
+                    <div class="metric-label">Net Revenue</div>
+                    <div class="metric-change" id="net-revenue-change"></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="refund-rate">0%</div>
+                    <div class="metric-label">Refund Rate</div>
+                    <div class="metric-change" id="refund-rate-change"></div>
+                </div>
+            </div>
+
+            <!-- Revenue Trends Chart -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">📈 Revenue Trends Over Time</h3>
+                    <canvas id="revenue-trends-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">🔄 Revenue by Source</h3>
+                    <canvas id="source-revenue-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Refund Analysis -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">💸 Refund Frequency: Full vs Partial</h3>
+                    <canvas id="refund-frequency-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">💰 Refund Amount: Full vs Partial</h3>
+                    <canvas id="refund-amount-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Additional Refund Analysis -->
+            <div class="charts-grid single-chart">
+                <div class="chart-card">
+                    <h3 class="chart-title">🎯 Refunds by Order Source</h3>
+                    <canvas id="refund-source-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Deep Analytics -->
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <h3 class="chart-title">🔍 Order Source Analysis</h3>
+                    <div id="source-analysis"></div>
+                </div>
+                <div class="analysis-card">
+                    <h3 class="chart-title">💳 Payment Insights</h3>
+                    <div id="payment-insights"></div>
+                </div>
+                <div class="analysis-card">
+                    <h3 class="chart-title">⏱️ Refund Timing Analysis</h3>
+                    <div id="refund-timing"></div>
+                </div>
+                <div class="analysis-card">
+                    <h3 class="chart-title">📊 Advanced Metrics</h3>
+                    <div id="advanced-metrics"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentPeriod = 'yesterday';
+        let dashboardData = null;
+        let charts = {};
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDateSelectors();
+            loadDashboardData();
+        });
+
+        function initializeDateSelectors() {
+            // Date button handlers
+            document.querySelectorAll('.date-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+
+                    // Add active class to clicked button
+                    this.classList.add('active');
+
+                    currentPeriod = this.dataset.period;
+
+                    // Show/hide custom date range
+                    const customRange = document.querySelector('.custom-date-range');
+                    if (currentPeriod === 'custom') {
+                        customRange.classList.add('active');
+                        setDefaultCustomDates();
+                    } else {
+                        customRange.classList.remove('active');
+                        loadDashboardData();
+                    }
+                });
+            });
+        }
+
+        function setDefaultCustomDates() {
+            const today = new Date();
+            const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+            document.getElementById('start-date').value = lastWeek.toISOString().split('T')[0];
+            document.getElementById('end-date').value = today.toISOString().split('T')[0];
+        }
+
+        function applyCustomRange() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            if (!startDate || !endDate) {
+                alert('Please select both start and end dates');
+                return;
+            }
+
+            if (new Date(startDate) > new Date(endDate)) {
+                alert('Start date must be before end date');
+                return;
+            }
+
+            loadDashboardData();
+        }
+
+        function getDateRange() {
+            const now = new Date();
+
+            switch (currentPeriod) {
+                case 'yesterday':
+                    const yesterday = new Date(now);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    return {
+                        start: yesterday.toISOString().split('T')[0],
+                        end: yesterday.toISOString().split('T')[0]
+                    };
+
+                case 'weekly':
+                    const startOfWeek = new Date(now);
+                    const dayOfWeek = startOfWeek.getDay();
+                    const diff = startOfWeek.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Adjust for Monday start
+                    startOfWeek.setDate(diff);
+
+                    return {
+                        start: startOfWeek.toISOString().split('T')[0],
+                        end: now.toISOString().split('T')[0]
+                    };
+
+                case 'monthly':
+                    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                    return {
+                        start: startOfMonth.toISOString().split('T')[0],
+                        end: now.toISOString().split('T')[0]
+                    };
+
+                case 'all-time':
+                    return {
+                        start: '2020-01-01',
+                        end: now.toISOString().split('T')[0]
+                    };
+
+                case 'custom':
+                    return {
+                        start: document.getElementById('start-date').value,
+                        end: document.getElementById('end-date').value
+                    };
+
+                default:
+                    return {
+                        start: '2020-01-01',
+                        end: now.toISOString().split('T')[0]
+                    };
+            }
+        }
+
+        async function loadDashboardData() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('dashboard-content').style.display = 'none';
+
+                const dateRange = getDateRange();
+
+                // Call Google Apps Script function
+                const response = await new Promise((resolve, reject) => {
+                    google.script.run
+                        .withSuccessHandler(resolve)
+                        .withFailureHandler(reject)
+                        .getRevenueAnalyticsData(dateRange.start, dateRange.end);
+                });
+
+                dashboardData = response;
+                renderDashboard();
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('loading').innerHTML =
+                    '<div class="error">Error loading data: ' + error.message + '</div>';
+            }
+        }
+
+        function renderDashboard() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dashboard-content').style.display = 'block';
+
+            renderMetrics();
+            renderCharts();
+            renderAnalysis();
+        }
+
+        function renderMetrics() {
+            const data = dashboardData;
+
+            // Format currency
+            const formatCurrency = (amount) => {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD'
+                }).format(amount);
+            };
+
+            // Format percentage
+            const formatPercent = (value) => {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'percent',
+                    minimumFractionDigits: 1,
+                    maximumFractionDigits: 1
+                }).format(value / 100);
+            };
+
+            // Update metric values
+            document.getElementById('gross-revenue').textContent = formatCurrency(data.metrics.grossRevenue);
+            document.getElementById('total-refunds').textContent = formatCurrency(data.metrics.totalRefunds);
+            document.getElementById('net-revenue').textContent = formatCurrency(data.metrics.netRevenue);
+            document.getElementById('refund-rate').textContent = formatPercent(data.metrics.refundRate);
+
+            // Update changes (if available)
+            if (data.metrics.changes) {
+                updateMetricChange('gross-revenue-change', data.metrics.changes.grossRevenue);
+                updateMetricChange('refunds-change', data.metrics.changes.totalRefunds);
+                updateMetricChange('net-revenue-change', data.metrics.changes.netRevenue);
+                updateMetricChange('refund-rate-change', data.metrics.changes.refundRate);
+            }
+        }
+
+        function updateMetricChange(elementId, change) {
+            const element = document.getElementById(elementId);
+            if (!change) return;
+
+            const sign = change > 0 ? '+' : '';
+            const className = change > 0 ? 'positive' : change < 0 ? 'negative' : 'neutral';
+
+            element.textContent = `${sign}${change.toFixed(1)}% vs previous period`;
+            element.className = `metric-change ${className}`;
+        }
+
+        function renderCharts() {
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => {
+                if (chart) chart.destroy();
+            });
+
+            // Revenue Trends Chart
+            charts.revenueTrends = new Chart(document.getElementById('revenue-trends-chart'), {
+                type: 'line',
+                data: {
+                    labels: dashboardData.charts.revenueTrends.labels,
+                    datasets: [
+                        {
+                            label: 'Gross Revenue',
+                            data: dashboardData.charts.revenueTrends.grossRevenue,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Net Revenue',
+                            data: dashboardData.charts.revenueTrends.netRevenue,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Source Revenue Chart
+            charts.sourceRevenue = new Chart(document.getElementById('source-revenue-chart'), {
+                type: 'doughnut',
+                data: {
+                    labels: dashboardData.charts.sourceRevenue.labels,
+                    datasets: [{
+                        data: dashboardData.charts.sourceRevenue.data,
+                        backgroundColor: [
+                            '#667eea',
+                            '#764ba2',
+                            '#f093fb',
+                            '#f5576c'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Refund Frequency Chart
+            charts.refundFrequency = new Chart(document.getElementById('refund-frequency-chart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Full Refunds', 'Partial Refunds'],
+                    datasets: [
+                        {
+                            label: 'Count',
+                            data: [
+                                dashboardData.refundAnalysis.fullRefunds.count,
+                                dashboardData.refundAnalysis.partialRefunds.count
+                            ],
+                            backgroundColor: ['#ef4444', '#f97316']
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.raw / total) * 100).toFixed(1);
+                                    return context.label + ': ' + context.raw + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Refund Amount Chart
+            charts.refundAmount = new Chart(document.getElementById('refund-amount-chart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Full Refunds', 'Partial Refunds'],
+                    datasets: [
+                        {
+                            label: 'Refund Amount',
+                            data: [
+                                dashboardData.refundAnalysis.fullRefunds.amount,
+                                dashboardData.refundAnalysis.partialRefunds.amount
+                            ],
+                            backgroundColor: ['#ef4444', '#f97316']
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': $' + context.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Refund Source Chart
+            charts.refundSource = new Chart(document.getElementById('refund-source-chart'), {
+                type: 'bar',
+                data: {
+                    labels: dashboardData.charts.refundBySource.labels,
+                    datasets: [{
+                        label: 'Refund Amount',
+                        data: dashboardData.charts.refundBySource.data,
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f97316',
+                            '#eab308',
+                            '#84cc16'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderAnalysis() {
+            // Source Analysis
+            const sourceHtml = dashboardData.analysis.sourceAnalysis.map(item =>
+                `<div class="insight-item">
+                    <span class="insight-label">${item.label}</span>
+                    <span class="insight-value">${item.value}</span>
+                </div>`
+            ).join('');
+            document.getElementById('source-analysis').innerHTML = sourceHtml;
+
+            // Payment Insights
+            const paymentHtml = dashboardData.analysis.paymentInsights.map(item =>
+                `<div class="insight-item">
+                    <span class="insight-label">${item.label}</span>
+                    <span class="insight-value">${item.value}</span>
+                </div>`
+            ).join('');
+            document.getElementById('payment-insights').innerHTML = paymentHtml;
+
+            // Refund Timing
+            const timingHtml = dashboardData.analysis.refundTiming.map(item =>
+                `<div class="insight-item">
+                    <span class="insight-label">${item.label}</span>
+                    <span class="insight-value">${item.value}</span>
+                </div>`
+            ).join('');
+            document.getElementById('refund-timing').innerHTML = timingHtml;
+
+            // Advanced Metrics
+            const advancedHtml = dashboardData.analysis.advancedMetrics.map(item =>
+                `<div class="insight-item">
+                    <span class="insight-label">${item.label}</span>
+                    <span class="insight-value">${item.value}</span>
+                </div>`
+            ).join('');
+            document.getElementById('advanced-metrics').innerHTML = advancedHtml;
+        }
+
+        // Fallback for testing without Google Apps Script
+        if (typeof google === 'undefined') {
+            console.warn('Google Apps Script not available, using mock data');
+            setTimeout(() => {
+                dashboardData = getMockData();
+                renderDashboard();
+            }, 1000);
+        }
+
+        function getMockData() {
+            return {
+                metrics: {
+                    grossRevenue: 72231.00,
+                    totalRefunds: 22806.84,
+                    netRevenue: 49424.16,
+                    refundRate: 31.57,
+                    changes: {
+                        grossRevenue: 12.5,
+                        totalRefunds: -8.3,
+                        netRevenue: 18.7,
+                        refundRate: -5.2
+                    }
+                },
+                charts: {
+                    revenueTrends: {
+                        labels: ['Aug 6', 'Aug 13', 'Aug 20', 'Aug 27', 'Sep 3', 'Sep 10'],
+                        grossRevenue: [12000, 15000, 18000, 14000, 16000, 19000],
+                        netRevenue: [8500, 11200, 13500, 9800, 12100, 14300]
+                    },
+                    sourceRevenue: {
+                        labels: ['Checkout (First-time)', 'Subscription', 'Other'],
+                        data: [25000, 42000, 5231]
+                    },
+                    refundBySource: {
+                        labels: ['Checkout', 'Subscription', 'Other'],
+                        data: [8500, 12300, 1906]
+                    }
+                },
+                refundAnalysis: {
+                    fullRefunds: {
+                        amount: 18658.00,
+                        count: 42
+                    },
+                    partialRefunds: {
+                        amount: 4148.84,
+                        count: 42
+                    }
+                },
+                analysis: {
+                    sourceAnalysis: [
+                        { label: 'First-time Orders', value: '84 orders' },
+                        { label: 'Repeat Orders', value: '183 orders' },
+                        { label: 'Checkout Revenue', value: '$22,757' },
+                        { label: 'Subscription Revenue', value: '$49,474' },
+                        { label: 'First-time Conversion Rate', value: '31.5%' }
+                    ],
+                    paymentInsights: [
+                        { label: 'Successful Payments', value: '317 transactions' },
+                        { label: 'Average Payment', value: '$227.70' },
+                        { label: 'Payment Success Rate', value: '98.4%' },
+                        { label: 'Orders with Payments', value: '141 matched' },
+                        { label: 'Payment Methods', value: '3 types' }
+                    ],
+                    refundTiming: [
+                        { label: 'Average Refund Time', value: '3.2 days' },
+                        { label: 'Checkout Refund Time', value: '1.8 days' },
+                        { label: 'Subscription Refund Time', value: '1.3 days' },
+                        { label: 'Same-day Refunds', value: '23 refunds' },
+                        { label: 'Refunds > 7 days', value: '8 refunds' }
+                    ],
+                    advancedMetrics: [
+                        { label: 'Customer Lifetime Value', value: '$347' },
+                        { label: 'Refund-to-Order Ratio', value: '31.5%' },
+                        { label: 'Partial Refund Rate', value: '50%' },
+                        { label: 'Repeat Customer Rate', value: '68.5%' },
+                        { label: 'Revenue per Customer', value: '$237' }
+                    ]
+                }
+            };
+        }
+    </script>
+</body>
+</html>
