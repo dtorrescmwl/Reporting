@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare KPI Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .time-period-selector {
+            padding: 10px 20px;
+            border: 2px solid #3498db;
+            border-radius: 25px;
+            background: white;
+            color: #3498db;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-period-selector:hover,
+        .time-period-selector.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .refresh-btn {
+            padding: 10px 20px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+
+        .time-navigation {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            padding: 8px 15px;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #7f8c8d;
+            transform: translateY(-1px);
+        }
+
+        .nav-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .time-period-selectors {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .custom-date-range {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .custom-date-range input {
+            padding: 8px 12px;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .custom-date-range button {
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .tracking-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .tracking-detail-card {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .tracking-detail-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .tracking-detail-date {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { color: rgba(0,0,0,0); text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0); }
+            40% { color: #7f8c8d; text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0); }
+            60% { text-shadow: .25em 0 0 #7f8c8d, .5em 0 0 rgba(0,0,0,0); }
+            80%, 100% { text-shadow: .25em 0 0 #7f8c8d, .5em 0 0 #7f8c8d; }
+        }
+
+        .error {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            font-size: 1.5rem;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #3498db;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f39c12, #e74c3c);
+        }
+
+        .kpi-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .kpi-subtext {
+            font-size: 0.85rem;
+            color: #95a5a6;
+        }
+
+        .kpi-trend {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .trend-up {
+            color: #27ae60;
+        }
+
+        .trend-down {
+            color: #e74c3c;
+        }
+
+        .trend-neutral {
+            color: #95a5a6;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .summary-card p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .metadata {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-align: center;
+        }
+
+        .placeholder {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>🏥 Healthcare KPI Dashboard</h1>
+            <p class="subtitle">Comprehensive Business Metrics & Analytics</p>
+        </div>
+
+        <div class="controls">
+            <!-- Navigation arrows for time periods -->
+            <div class="time-navigation">
+                <button id="prev-period" class="nav-btn" onclick="navigatePeriod(-1)">← Previous</button>
+                <button id="next-period" class="nav-btn" onclick="navigatePeriod(1)">Next →</button>
+            </div>
+
+            <!-- Time period selectors -->
+            <div class="time-period-selectors">
+                <div class="time-period-selector" data-period="daily">Daily</div>
+                <div class="time-period-selector active" data-period="monthly">Monthly</div>
+                <div class="time-period-selector" data-period="weekly">Weekly</div>
+                <div class="time-period-selector" data-period="quarterly">Quarterly</div>
+                <div class="time-period-selector" data-period="annually">Annually</div>
+                <div class="time-period-selector" data-period="all_time">All Time</div>
+                <div class="time-period-selector" data-period="custom">Custom Range</div>
+            </div>
+
+            <!-- Custom date range selector -->
+            <div id="custom-date-range" class="custom-date-range" style="display: none;">
+                <input type="date" id="start-date" placeholder="Start Date">
+                <input type="date" id="end-date" placeholder="End Date">
+                <button onclick="applyCustomRange()">Apply Range</button>
+            </div>
+
+            <button class="refresh-btn" onclick="refreshData()">🔄 Refresh Data</button>
+        </div>
+
+        <div id="loading" class="loading">Loading KPI data</div>
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="dashboard-content" style="display: none;">
+            <!-- Summary Statistics -->
+            <div class="summary-stats">
+                <div class="summary-card">
+                    <h3 id="total-customers">-</h3>
+                    <p>Total Customers</p>
+                </div>
+                <div class="summary-card">
+                    <h3 id="active-subscriptions">-</h3>
+                    <p>Active Subscriptions</p>
+                </div>
+                <div class="summary-card">
+                    <h3 id="total-orders">-</h3>
+                    <p>Total Orders</p>
+                </div>
+                <div class="summary-card">
+                    <h3 id="total-revenue">-</h3>
+                    <p>Total Revenue</p>
+                </div>
+            </div>
+
+            <!-- Growth & Revenue Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="section-icon">📈</span>
+                    Growth & Revenue Metrics
+                </h2>
+                <div class="kpi-grid" id="growth-revenue-kpis">
+                    <!-- KPI cards will be dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Operations & Logistics Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="section-icon">⚙️</span>
+                    Operations & Logistics Metrics
+                </h2>
+                <div class="kpi-grid" id="operations-kpis">
+                    <!-- KPI cards will be dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Clinical & Patient Success Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="section-icon">🏥</span>
+                    Clinical & Patient Success Metrics
+                </h2>
+                <div class="kpi-grid" id="clinical-kpis">
+                    <!-- KPI cards will be dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Financial Risk Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="section-icon">💰</span>
+                    Financial Risk Metrics
+                </h2>
+                <div class="kpi-grid" id="financial-kpis">
+                    <!-- KPI cards will be dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Order Flow Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="section-icon">🔄</span>
+                    Order Flow & Stage Analysis
+                </h2>
+                <div class="kpi-grid" id="order-flow-kpis">
+                    <!-- KPI cards will be dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Data Tracking Details Section (All Time view only) -->
+            <div class="section" id="tracking-details-section" style="display: none;">
+                <h2 class="section-title">
+                    <span class="section-icon">📅</span>
+                    Data Tracking History
+                </h2>
+                <div class="tracking-details" id="tracking-details">
+                    <!-- Tracking details will be populated for All Time view -->
+                </div>
+            </div>
+
+
+            <!-- Placeholders for Future KPIs -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="section-icon">🔮</span>
+                    Pending KPIs (In Development)
+                </h2>
+
+                <div class="kpi-grid">
+                    <div class="placeholder">
+                        <h3>Customer Acquisition Cost (CAC)</h3>
+                        <p>Requires marketing cost data integration</p>
+                    </div>
+                    <div class="placeholder">
+                        <h3>Cancelled Order/Refund Rate</h3>
+                        <p>Enhanced Stripe tracking in development</p>
+                    </div>
+                    <div class="placeholder">
+                        <h3>Shipping SLA Compliance</h3>
+                        <p>Requires shipping provider API integration</p>
+                    </div>
+                    <div class="placeholder">
+                        <h3>Support Ticket Metrics</h3>
+                        <p>Requires support system integration</p>
+                    </div>
+                    <div class="placeholder">
+                        <h3>Average Weight Loss</h3>
+                        <p>Requires patient outcome data extraction</p>
+                    </div>
+                    <div class="placeholder">
+                        <h3>Lead-to-Consult Conversion</h3>
+                        <p>Requires marketing funnel data integration</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="metadata" id="metadata" style="display: none;">
+            <!-- Metadata will be populated dynamically -->
+        </div>
+    </div>
+
+    <script>
+        let currentPeriod = 'monthly';
+        let currentData = null;
+        let charts = {};
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Time period selectors
+            document.querySelectorAll('.time-period-selector').forEach(selector => {
+                selector.addEventListener('click', function() {
+                    document.querySelectorAll('.time-period-selector').forEach(s => s.classList.remove('active'));
+                    this.classList.add('active');
+                    currentPeriod = this.dataset.period;
+                    loadData();
+                });
+            });
+        }
+
+        function loadData() {
+            showLoading();
+
+            google.script.run
+                .withSuccessHandler(onDataLoaded)
+                .withFailureHandler(onDataError)
+                .calculateKPIs(currentPeriod);
+        }
+
+        function loadKPIs(period, offset = 0, startDate = null, endDate = null) {
+            showLoading();
+
+            // For custom dates, pass the dates to the backend
+            if (period === 'custom' && startDate && endDate) {
+                google.script.run
+                    .withSuccessHandler(onDataLoaded)
+                    .withFailureHandler(onDataError)
+                    .calculateKPIsWithCustomDates(startDate, endDate);
+            } else {
+                // For other periods, use the standard function
+                google.script.run
+                    .withSuccessHandler(onDataLoaded)
+                    .withFailureHandler(onDataError)
+                    .calculateKPIs(period);
+            }
+        }
+
+        function refreshData() {
+            loadData();
+        }
+
+        function onDataLoaded(data) {
+            console.log('KPI data loaded:', data);
+            currentData = data;
+
+            if (data.error) {
+                showError('Error loading data: ' + data.error);
+                return;
+            }
+
+            hideLoading();
+            populateDashboard(data);
+            showMetadata(data);
+        }
+
+        function onDataError(error) {
+            console.error('Error loading KPI data:', error);
+            showError('Failed to load dashboard data. Please check your connection and try again.');
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('dashboard-content').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dashboard-content').style.display = 'block';
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = message;
+        }
+
+        function populateDashboard(data) {
+            // Populate summary statistics
+            document.getElementById('total-customers').textContent = data.summary.totalCustomers.toLocaleString();
+            document.getElementById('active-subscriptions').textContent = data.summary.activeSubscriptions.toLocaleString();
+            document.getElementById('total-orders').textContent = data.summary.totalOrders.toLocaleString();
+            document.getElementById('total-revenue').textContent = '$' + data.summary.totalRevenue.toLocaleString();
+
+            // Populate Growth & Revenue KPIs
+            populateKPISection('growth-revenue-kpis', data.growthRevenue);
+
+            // Populate Operations KPIs
+            populateKPISection('operations-kpis', data.operations);
+
+            // Populate Clinical KPIs
+            populateKPISection('clinical-kpis', data.clinical);
+
+            // Populate Financial Risk KPIs
+            populateKPISection('financial-kpis', data.financial);
+
+            // Populate Order Flow KPIs
+            populateKPISection('order-flow-kpis', data.orderFlow);
+
+            // Show tracking details for All Time view
+            showTrackingDetails(data);
+        }
+
+        function populateKPISection(containerId, kpiData) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            Object.keys(kpiData).forEach(key => {
+                const kpi = kpiData[key];
+                const card = createKPICard(kpi);
+                container.appendChild(card);
+            });
+        }
+
+        function createKPICard(kpi) {
+            const card = document.createElement('div');
+            card.className = 'kpi-card';
+
+            let subtextHtml = '';
+            if (kpi.sampleSize !== undefined) {
+                subtextHtml = `<div class="kpi-subtext">Sample size: ${kpi.sampleSize}</div>`;
+            }
+
+            let trendHtml = '';
+            if (kpi.trend !== null && kpi.trend !== undefined) {
+                const trendClass = kpi.trend > 0 ? 'trend-up' : kpi.trend < 0 ? 'trend-down' : 'trend-neutral';
+                const trendIcon = kpi.trend > 0 ? '↗️' : kpi.trend < 0 ? '↘️' : '➡️';
+                trendHtml = `<div class="kpi-trend ${trendClass}">${trendIcon} ${Math.abs(kpi.trend).toFixed(1)}%</div>`;
+            }
+
+            card.innerHTML = `
+                <div class="kpi-label">${kpi.label}</div>
+                <div class="kpi-value">${kpi.formatted || kpi.value}</div>
+                ${subtextHtml}
+                ${trendHtml}
+            `;
+
+            return card;
+        }
+
+        function createCharts(data) {
+            // Charts removed - visualizations section deleted
+        }
+
+
+        function showMetadata(data) {
+            const metadata = document.getElementById('metadata');
+            metadata.innerHTML = `
+                <strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()} |
+                <strong>Time Period:</strong> ${data.timePeriod} |
+                <strong>Data Points:</strong> ${data.dataPoints.subscriptions} subscriptions, ${data.dataPoints.customers} customers, ${data.dataPoints.orders} orders
+            `;
+            metadata.style.display = 'block';
+        }
+
+        // Navigation and new timeframe functionality
+        let currentPeriodOffset = 0;
+
+        function navigatePeriod(direction) {
+            if (currentPeriod === 'all_time' || currentPeriod === 'custom') {
+                return; // No navigation for these periods
+            }
+
+            currentPeriodOffset += direction;
+
+            // Update next button visibility (disable if we're at current period)
+            const nextBtn = document.getElementById('next-period');
+            nextBtn.disabled = currentPeriodOffset >= 0;
+
+            loadKPIs(currentPeriod, currentPeriodOffset);
+        }
+
+        function applyCustomRange() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            if (!startDate || !endDate) {
+                alert('Please select both start and end dates');
+                return;
+            }
+
+            if (new Date(startDate) > new Date(endDate)) {
+                alert('Start date cannot be after end date');
+                return;
+            }
+
+            loadKPIs('custom', 0, startDate, endDate);
+        }
+
+        function showTrackingDetails(data) {
+            const section = document.getElementById('tracking-details-section');
+            const details = document.getElementById('tracking-details');
+
+            if (currentPeriod === 'all_time') {
+                // Calculate first dates for each metric
+                const firstDates = calculateFirstDates(data);
+
+                details.innerHTML = '';
+                Object.keys(firstDates).forEach(metric => {
+                    const card = document.createElement('div');
+                    card.className = 'tracking-detail-card';
+                    card.innerHTML = `
+                        <div class="tracking-detail-title">${metric}</div>
+                        <div class="tracking-detail-date">First tracked: ${firstDates[metric]}</div>
+                    `;
+                    details.appendChild(card);
+                });
+
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function calculateFirstDates(data) {
+            const firstDates = {};
+
+            // Helper function to find earliest date in array
+            function findEarliestDate(array, dateField) {
+                if (!array || array.length === 0) return null;
+
+                const dates = array.map(item => new Date(item[dateField]))
+                    .filter(date => !isNaN(date));
+
+                return dates.length > 0 ? new Date(Math.min(...dates)) : null;
+            }
+
+            // Calculate first dates for each data type
+            const earliestPayment = findEarliestDate(data.dataPoints?.payments || [], 'datetime');
+            if (earliestPayment) {
+                firstDates['First Purchase'] = earliestPayment.toLocaleDateString();
+            }
+
+            const earliestShipment = findEarliestDate(data.dataPoints?.shipped || [], 'Updated At');
+            if (earliestShipment) {
+                firstDates['First Shipment'] = earliestShipment.toLocaleDateString();
+            }
+
+            const earliestSubscription = findEarliestDate(data.dataPoints?.subscriptions || [], 'Datetime Created');
+            if (earliestSubscription) {
+                firstDates['First Subscription'] = earliestSubscription.toLocaleDateString();
+            }
+
+            const earliestRefund = findEarliestDate(data.dataPoints?.refunds || [], 'datetime');
+            if (earliestRefund) {
+                firstDates['First Refund'] = earliestRefund.toLocaleDateString();
+            }
+
+            const earliestOrder = findEarliestDate(data.dataPoints?.orders || [], 'created_at');
+            if (earliestOrder) {
+                firstDates['First Order'] = earliestOrder.toLocaleDateString();
+            }
+
+            return firstDates;
+        }
+
+        // Update time period selector functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle time period selection
+            document.querySelectorAll('.time-period-selector').forEach(selector => {
+                selector.addEventListener('click', function() {
+                    const period = this.dataset.period;
+
+                    // Reset offset when changing periods
+                    currentPeriodOffset = 0;
+
+                    // Update active state
+                    document.querySelectorAll('.time-period-selector').forEach(s => s.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Show/hide custom date range
+                    const customRange = document.getElementById('custom-date-range');
+                    customRange.style.display = period === 'custom' ? 'block' : 'none';
+
+                    // Update navigation buttons
+                    updateNavigationButtons(period);
+
+                    currentPeriod = period;
+
+                    if (period !== 'custom') {
+                        loadKPIs(period);
+                    }
+                });
+            });
+        });
+
+        function updateNavigationButtons(period) {
+            const prevBtn = document.getElementById('prev-period');
+            const nextBtn = document.getElementById('next-period');
+
+            if (period === 'all_time' || period === 'custom') {
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+            } else {
+                prevBtn.style.display = 'block';
+                nextBtn.style.display = 'block';
+                nextBtn.disabled = currentPeriodOffset >= 0;
+            }
+        }
+    </script>
+</body>
+</html>
