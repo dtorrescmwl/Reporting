@@ -190,6 +190,9 @@ function calculateGrowthRevenueKPIs(data, timePeriod) {
   }, 0) : 0;
   const netRevenue = grossRevenue - totalRefunds;
 
+  // Renewal Order Percentage (% of users with 2+ non-$0 orders)
+  const renewalOrderData = calculateRenewalOrderPercentage(data);
+
   return {
     newEnrollments: {
       value: newEnrollments,
@@ -254,6 +257,14 @@ function calculateGrowthRevenueKPIs(data, timePeriod) {
       label: 'Net Revenue (After Refunds)',
       formatted: `$${netRevenue.toLocaleString()}`,
       refundAmount: totalRefunds,
+      trend: null
+    },
+    renewalOrderPercentage: {
+      value: renewalOrderData.percentage,
+      label: 'Renewal Order Rate',
+      formatted: `${renewalOrderData.percentage.toFixed(2)}%`,
+      sampleSize: renewalOrderData.totalUsersWithOrders,
+      renewalUsers: renewalOrderData.renewalUsers,
       trend: null
     }
   };
@@ -1237,6 +1248,56 @@ function calculateRenewalRate(data, timePeriod) {
   // For now, return inverse of churn rate as approximation
   const churnRate = calculateChurnRate(data, timePeriod);
   return 100 - churnRate;
+}
+
+/**
+ * Calculate Renewal Order Percentage
+ * Returns the percentage of users who have at least 2 non-$0 orders
+ * out of all users who have at least one order
+ */
+function calculateRenewalOrderPercentage(data) {
+  // Group payments by customer ID to count orders per user
+  const customerOrders = {};
+
+  // Process payments data to count non-$0 orders per customer
+  if (data.payments && data.payments.length > 0) {
+    data.payments.forEach(payment => {
+      const customerId = payment.customer_id;
+      const amount = parseFloat(payment.amount) || 0;
+
+      // Only count non-$0 payments as valid orders
+      if (customerId && amount > 0) {
+        if (!customerOrders[customerId]) {
+          customerOrders[customerId] = 0;
+        }
+        customerOrders[customerId]++;
+      }
+    });
+  }
+
+  // Count users with at least one order and users with 2+ orders
+  let totalUsersWithOrders = 0;
+  let renewalUsers = 0;
+
+  Object.values(customerOrders).forEach(orderCount => {
+    if (orderCount >= 1) {
+      totalUsersWithOrders++;
+      if (orderCount >= 2) {
+        renewalUsers++;
+      }
+    }
+  });
+
+  // Calculate percentage
+  const percentage = totalUsersWithOrders > 0 ? (renewalUsers / totalUsersWithOrders) * 100 : 0;
+
+  console.log(`Renewal Order Analysis: ${renewalUsers}/${totalUsersWithOrders} users have 2+ orders (${percentage.toFixed(2)}%)`);
+
+  return {
+    percentage: percentage,
+    renewalUsers: renewalUsers,
+    totalUsersWithOrders: totalUsersWithOrders
+  };
 }
 
 /**
