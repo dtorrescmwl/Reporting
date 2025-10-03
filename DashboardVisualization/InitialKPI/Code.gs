@@ -419,18 +419,11 @@ function calculateOperationsKPIs(data, timePeriod) {
   const stageTimings = calculateStageTimings(data, timePeriod);
 
   return {
-    purchaseToAwaitingScript: {
-      value: stageTimings.purchaseToAwaitingScript.avgHours,
-      label: 'Avg Time: Purchase → Awaiting Script',
-      formatted: `${stageTimings.purchaseToAwaitingScript.avgHours.toFixed(1)} hours`,
-      sampleSize: stageTimings.purchaseToAwaitingScript.sampleSize,
-      trend: null
-    },
-    awaitingScriptToAwaitingShipment: {
-      value: stageTimings.awaitingScriptToAwaitingShipment.avgHours,
-      label: 'Avg Time: Awaiting Script → Awaiting Shipment',
-      formatted: `${stageTimings.awaitingScriptToAwaitingShipment.avgHours.toFixed(1)} hours`,
-      sampleSize: stageTimings.awaitingScriptToAwaitingShipment.sampleSize,
+    purchaseToShipped: {
+      value: stageTimings.purchaseToShipped.avgHours,
+      label: 'Avg Time: Purchase → Shipped (Total)',
+      formatted: `${stageTimings.purchaseToShipped.avgHours.toFixed(1)} hours`,
+      sampleSize: stageTimings.purchaseToShipped.sampleSize,
       trend: null
     },
     awaitingShipmentToShipped: {
@@ -440,11 +433,18 @@ function calculateOperationsKPIs(data, timePeriod) {
       sampleSize: stageTimings.awaitingShipmentToShipped.sampleSize,
       trend: null
     },
-    purchaseToShipped: {
-      value: stageTimings.purchaseToShipped.avgHours,
-      label: 'Avg Time: Purchase → Shipped (Total)',
-      formatted: `${stageTimings.purchaseToShipped.avgHours.toFixed(1)} hours`,
-      sampleSize: stageTimings.purchaseToShipped.sampleSize,
+    awaitingScriptToAwaitingShipment: {
+      value: stageTimings.awaitingScriptToAwaitingShipment.avgHours,
+      label: 'Avg Time: Awaiting Script → Awaiting Shipment',
+      formatted: `${stageTimings.awaitingScriptToAwaitingShipment.avgHours.toFixed(1)} hours`,
+      sampleSize: stageTimings.awaitingScriptToAwaitingShipment.sampleSize,
+      trend: null
+    },
+    purchaseToAwaitingScript: {
+      value: stageTimings.purchaseToAwaitingScript.avgHours,
+      label: 'Avg Time: Purchase → Awaiting Script',
+      formatted: `${stageTimings.purchaseToAwaitingScript.avgHours.toFixed(1)} hours`,
+      sampleSize: stageTimings.purchaseToAwaitingScript.sampleSize,
       trend: null
     }
   };
