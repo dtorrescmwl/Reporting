@@ -13,14 +13,25 @@ This directory contains all live Google Sheets with real data and their correspo
   - Customer information and order details
   - Status history and updates
 
-### Database_CarePortals.xlsx  
-- **URL**: [Add Google Sheets URL here]
+### Database_CarePortals.xlsx
+- **URL**: https://docs.google.com/spreadsheets/d/1PaCOgNJmKSb2VsJjCMjWpCG-gwrO7uVkuTAFUdrV-_o/edit
 - **Purpose**: Normalized database structure for relational data storage
-- **Last Updated**: [Add date]
+- **Last Updated**: October 7, 2025
+- **Total Sheets**: 16 sheets with 5,100+ total records
+- **Complete Schema**: See `/GoogleSheets/DATABASE_CAREPORTALS_SCHEMA.md` for detailed documentation
 - **Key Features**:
-  - Separate tables for orders, customers, products, addresses
-  - Relational structure with proper foreign keys
-  - Deduplication of customer and address data
+  - **Core Tables**: orders (476), customers (281), products (26), addresses (248)
+  - **Subscription Management**: active (206), paused (15), cancelled (53), full_log (202)
+  - **Payment Integration**: payment_succesful (438), refund.created (121) with real-time webhooks
+  - **🆕 Order Tracking**: order.updated (3,081) - Real-time order status changes
+  - **Relational Structure**: Proper foreign keys with MD5-hashed address deduplication
+  - **Data Quality**: Email-based customer deduplication, normalized addresses
+  - **Enhanced Products**: Short_name field for dashboard display
+  - **Stripe Integration**: Complete payment ecosystem with historical and real-time data
+    - **payment_succesful Tab**: ✅ **REAL-TIME** Live webhook-driven payment tracking from StripeTracking.js
+    - **refund.created Tab**: ✅ **REAL-TIME** Live webhook-driven refund tracking from StripeTracking.js
+    - **API Integration**: Automatic order number extraction, card details, actual fees
+  - **Quality Controls**: 99%+ data completeness, timezone standardization (Eastern Time)
 
 ### Customer_Support.xlsx
 - **URL**: https://docs.google.com/spreadsheets/d/1h-ttn7R6s2KszovW_NvBI1x6fVUaXAjcID6-Xa0ISsw/edit?gid=1296501344#gid=1296501344
@@ -41,11 +52,22 @@ This directory contains all live Google Sheets with real data and their correspo
 ### Embeddables.xlsx
 - **URL**: [Add Google Sheets URL here]  
 - **Purpose**: Form submission tracking and funnel analysis for embeddable forms
-- **Last Updated**: [Add date]
+- **Last Updated**: September 8, 2025
 - **Key Features**:
   - Form submission data from all embeddables
   - Conversion tracking and analytics
   - User journey mapping
+  - Dashboard integration for real-time analytics
+
+### extended_record.csv
+- **Location**: `GoogleSheets/extended_record.csv`
+- **Purpose**: Extended order and customer data beyond Database_CarePortals scope
+- **Last Updated**: September 8, 2025
+- **Key Features**:
+  - 224 order records with customer information
+  - Financial data (total_amount, discount_amount, base_amount)
+  - Datetime Purchase timestamps
+  - Ready for merge into Database_CarePortals.xlsx
 
 ## 📊 Sheet Management Guidelines
 

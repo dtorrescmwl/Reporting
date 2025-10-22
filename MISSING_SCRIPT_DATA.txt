@@ -1,0 +1,67 @@
+MISSING SCRIPT DATA FOR CLASP INTEGRATION
+=============================================
+
+This document lists the essential URLs needed for CLASP deployment setup.
+
+WHAT TO PROVIDE:
+- Apps Script Editor URL (I'll extract the Project ID from this)
+- Web App URL (if deployed - I'll extract the Script ID from this)
+- Deployment Status (YES/NO - is it currently receiving data?)
+
+INSTRUCTIONS:
+Just provide the editor URL like: script.google.com/d/[PROJECT_ID]/edit
+I'll automatically extract all IDs needed for CLASP from the URLs you provide.
+
+===============================================================================
+
+1. STRIPE TRACKING (NEW SCRIPT - NEEDS DEPLOYMENT)
+   File: AppScripts/CarePortals/StripeTracking.js
+   Spreadsheet: Database CarePortals (1PaCOgNJmKSb2VsJjCMjWpCG-gwrO7uVkuTAFUdrV-_o)
+
+   NEEDED:
+   - Apps Script Editor URL: https://script.google.com/home/projects/1LDsSZoGKVZhGLN5qval-YJtCjY8vZWo0lcOYvCBp8r3EQ1oXlmTOfvMS/edit
+   - Web App URL (if deployed): https://script.google.com/macros/s/AKfycbxiwMYL8jlJtO7VXoqTBcnjSieWGEH0lhzRJvWxQGdBPg1ZAUaV8oivSYFfho45Sge_jA/exec
+   - Deployment Status [YES/NO]: YES
+
+===============================================================================
+
+2. ANALYTICS DASHBOARD (READY FOR DEPLOYMENT)
+   Files: DashboardVisualization/Analytics/Code.gs
+          DashboardVisualization/Analytics/dashboard.html
+   Spreadsheet: Database CarePortals (1PaCOgNJmKSb2VsJjCMjWpCG-gwrO7uVkuTAFUdrV-_o)
+
+   NEEDED:
+   - Apps Script Project Name: Analytics_Dashboard
+   - Apps Script Editor URL: https://script.google.com/home/projects/1v9PY_D7iz3QRvaQnNZKFebw-0ShFhwmjyqSPJTLNMAMpScKyEWJR9_EU/edit
+   - Deployment URL: https://script.google.com/a/macros/cmwlvirtual.com/s/AKfycbzo85VZL3NPBv3mNySOz0wAuPFnDK7L4zmNB7D6pzQSbzrpJXxAYJyJv-kY2ZP3i5X3/exec
+   - Deployment Status [YES/NO]: YES
+
+===============================================================================
+
+3. INITIAL KPI DASHBOARD (READY FOR DEPLOYMENT)
+   Files: DashboardVisualization/InitialKPI/Code.gs
+          DashboardVisualization/InitialKPI/kpi_dashboard.html
+   Spreadsheet: Database CarePortals (1PaCOgNJmKSb2VsJjCMjWpCG-gwrO7uVkuTAFUdrV-_o)
+
+   NEEDED:
+   - Apps Script Project Name: InitialKPI_Dashboard
+   - Apps Script Editor URL: https://script.google.com/home/projects/1Y2GN0BC-_nseRMV4JZvDeM8hPR4rc19GzYf4wSEK5BIJvSbGHwwRzoZN/edit
+   - Deployment URL: https://script.google.com/a/macros/cmwlvirtual.com/s/AKfycbymUCQOLa6E1TM3wPZbBP2g6XnRinFtPo_RL2DmoP3LKjhywEbNTaWgk_YUQjiXrRVf/exec
+   - Deployment Status [YES/NO]: YES
+
+===============================================================================
+
+4. REVENUE ANALYTICS DASHBOARD (READY FOR DEPLOYMENT)
+   Files: DashboardVisualization/RevenueAnalytics/RevenueAnalyticsCode.gs
+          DashboardVisualization/RevenueAnalytics/revenue_analytics.html
+   Spreadsheet: Database CarePortals (1PaCOgNJmKSb2VsJjCMjWpCG-gwrO7uVkuTAFUdrV-_o)
+
+   NEEDED:
+   - Apps Script Project Name: Revenue_Analytics
+   - Apps Script Editor URL: https://script.google.com/home/projects/1M0J6JsQKVEYmvN7VX01BwXqOYIUiiV8ZeaN6BPpAwp9xOelK1xVl9U86/edit
+   - Deployment URL: https://script.google.com/a/macros/cmwlvirtual.com/s/AKfycbzFp58ZL6OA1RJQRqs5iCu_4aBa4uXo54s10C3kYTDTW6_79KckuNC9GaRwA-pJ3BVvzQ/exec
+   - Deployment Status [YES/NO]: YES
+
+===============================================================================
+
+That's it! Just provide the editor URLs and I'll extract all the IDs needed for CLASP.

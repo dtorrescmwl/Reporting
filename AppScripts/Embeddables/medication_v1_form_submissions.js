@@ -10,9 +10,18 @@ function doPost(e) {
     // Parse the incoming data
     const submissionData = JSON.parse(e.postData.contents);
     
-    // Check if email or phone are empty - if so, don't add to sheet
-    if (!submissionData.email || !submissionData.phone || submissionData.email.trim() === '' || submissionData.phone.trim() === '') {
+    // Log all incoming submissions for debugging
+    console.log('Received submission with entryId:', submissionData.entryId, 'email:', submissionData.email, 'phone:', submissionData.phone);
+    
+    // Check if email is empty - email is required
+    if (!submissionData.email || submissionData.email.trim() === '') {
+      console.log('Rejected submission - missing email:', submissionData.entryId);
       return;
+    }
+    
+    // Log if phone is missing but continue processing
+    if (!submissionData.phone || submissionData.phone.trim() === '') {
+      console.log('Warning: submission missing phone, continuing with webhook:', submissionData.entryId);
     }
     
     // Email filtering - reject banned emails
@@ -198,12 +207,15 @@ function doPost(e) {
     ]);
     
     // NEW: Send outgoing webhook to GoHighLevel after successful sheet insertion
+    console.log('Sheet insertion successful, about to send webhook for entryId:', submissionData.entryId);
+    console.log('Raw submission data for webhook:', JSON.stringify(submissionData, null, 2));
     try {
       // Send single webhook with both tags
       const webhookSuccess = sendCombinedWebhook(submissionData);
-      console.log('Combined webhook result:', webhookSuccess);
+      console.log('Combined webhook result for', submissionData.entryId, ':', webhookSuccess);
     } catch (webhookError) {
-      console.error('Error sending combined webhook:', webhookError);
+      console.error('Error sending combined webhook for', submissionData.entryId, ':', webhookError);
+      console.error('Webhook error stack:', webhookError.stack);
       // Note: We don't fail the main submission if the webhook fails
     }
     
@@ -235,10 +247,19 @@ function doPost(e) {
 
 // NEW: Function to send combined webhook with both tags to GoHighLevel
 function sendCombinedWebhook(submissionData) {
+  console.log('=== WEBHOOK FUNCTION START ===');
+  console.log('sendCombinedWebhook called for entryId:', submissionData.entryId);
+  console.log('form_source value:', submissionData.form_source);
+  console.log('first_name value:', submissionData.first_name);
+  console.log('last_name value:', submissionData.last_name);
+  console.log('email value:', submissionData.email);
+  console.log('phone value:', submissionData.phone);
+  
   try {
     // Determine form-specific tag
     let formTag = '';
     const formSource = String(submissionData.form_source || '').toLowerCase();
+    console.log('Form source converted to lowercase:', formSource);
     
     switch(formSource) {
       case 'medication v1':
@@ -264,9 +285,15 @@ function sendCombinedWebhook(submissionData) {
       firstName: safeString(submissionData.first_name),
       lastName: safeString(submissionData.last_name),
       email: safeString(submissionData.email),
-      phone: safeString(submissionData.phone),
+      phone: safeString(submissionData.phone) || 'No Phone Provided',
       tags: combinedTags
     };
+    
+    // Extra validation for webhook-critical data
+    if (!payload.email || payload.email.trim() === '') {
+      console.error('Cannot send webhook - email is required for GoHighLevel');
+      return { success: false, error: 'Email required for webhook' };
+    }
     
     // Helper function to safely get string values (redefined for this scope)
     function safeString(value) {
@@ -289,15 +316,22 @@ function sendCombinedWebhook(submissionData) {
       payload: JSON.stringify(payload)
     };
     
-    console.log('Sending combined webhook with payload:', payload);
+    console.log('=== ABOUT TO SEND HTTP REQUEST ===');
+    console.log('Webhook URL:', webhookUrl);
+    console.log('HTTP options:', JSON.stringify(options, null, 2));
+    console.log('Payload being sent:', JSON.stringify(payload, null, 2));
     
     // Send the request
+    console.log('Calling UrlFetchApp.fetch...');
     const response = UrlFetchApp.fetch(webhookUrl, options);
+    console.log('UrlFetchApp.fetch completed');
+    
     const responseCode = response.getResponseCode();
     const responseText = response.getContentText();
     
-    console.log('Combined webhook response code:', responseCode);
-    console.log('Combined webhook response text:', responseText);
+    console.log('=== HTTP RESPONSE RECEIVED ===');
+    console.log('Response code:', responseCode);
+    console.log('Response text:', responseText);
     
     if (responseCode >= 200 && responseCode < 300) {
       console.log('Combined webhook sent successfully with tags:', combinedTags);
@@ -462,4 +496,90 @@ function testCombinedWebhook() {
   console.log('Testing combined webhook with both tags:');
   const result = sendCombinedWebhook(testData);
   console.log('Combined webhook result:', result);
+  return result;
+}
+
+/**
+ * New test function to verify doPost flow without actual sheet writing
+ */
+function testDoPostFlow() {
+  console.log('=== TESTING COMPLETE DOPOST FLOW ===');
+  
+  const mockEvent = {
+    postData: {
+      contents: JSON.stringify({
+        entryId: 'debug_test_' + new Date().getTime(),
+        form_source: 'medication v1',
+        first_name: 'Debug',
+        last_name: 'Test',
+        email: 'debug.test@example.com',
+        phone: '555-999-8888',
+        submission_timestamp: new Date().toISOString(),
+        age: '25',
+        sex_assigned_at_birth: 'Male'
+      })
+    }
+  };
+  
+  try {
+    // Temporarily bypass sheet operations to test webhook flow
+    console.log('Mock event created, testing doPost...');
+    const result = doPost(mockEvent);
+    console.log('doPost completed, result:', result.getContent());
+    return JSON.parse(result.getContent());
+  } catch (error) {
+    console.error('doPost test failed with error:', error);
+    console.error('Error stack:', error.stack);
+    return { error: error.toString(), stack: error.stack };
+  }
+}
+
+/**
+ * Test GoHighLevel API endpoint directly
+ */
+function testGoHighLevelAPI() {
+  console.log('=== TESTING GOHIGHLEVEL API DIRECTLY ===');
+  
+  const webhookUrl = 'https://rest.gohighlevel.com/v1/contacts/';
+  const bearerToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbl9pZCI6IjNmbDFlQ0VoUWRBbTgyUGdMN0lWIiwidmVyc2lvbiI6MSwiaWF0IjoxNzQzMDE3MzA3MzAyLCJzdWIiOiJhVlFyak9FU2ZTNUpDalFSR0FwMyJ9.S6zYJBH_jGIJ-B8hUUr2UrdLxLEdC3S9P-0TI196YTQ';
+  
+  const testPayload = {
+    firstName: 'API',
+    lastName: 'Test',
+    email: 'api.test@example.com',
+    phone: '555-000-1111',
+    tags: 'apitestsurvey'
+  };
+  
+  const options = {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${bearerToken}`,
+      'Content-Type': 'application/json'
+    },
+    payload: JSON.stringify(testPayload)
+  };
+  
+  try {
+    console.log('Testing direct API call to GoHighLevel...');
+    console.log('URL:', webhookUrl);
+    console.log('Payload:', JSON.stringify(testPayload, null, 2));
+    
+    const response = UrlFetchApp.fetch(webhookUrl, options);
+    const responseCode = response.getResponseCode();
+    const responseText = response.getContentText();
+    
+    console.log('API Test Response Code:', responseCode);
+    console.log('API Test Response Text:', responseText);
+    
+    return {
+      success: responseCode >= 200 && responseCode < 300,
+      responseCode,
+      responseText
+    };
+    
+  } catch (error) {
+    console.error('API test error:', error);
+    return { success: false, error: error.toString() };
+  }
 }

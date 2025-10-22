@@ -1,0 +1,11 @@
+# Ignore backup files
+*.backup
+*_Backup.gs
+*_backup.gs
+Code_Diagnostic_Backup.gs
+test-dashboard.gs.backup
+
+# Ignore common development files
+node_modules/
+.git/
+*.log

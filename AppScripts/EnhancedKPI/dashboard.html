@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced KPI Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .refresh-btn {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .refresh-btn:disabled {
+            background: #6B7280;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            margin: 50px 0;
+        }
+
+        .error {
+            background: #FEE2E2;
+            border: 1px solid #FECACA;
+            color: #DC2626;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .metric-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-icon {
+            font-size: 1.5rem;
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1F2937;
+        }
+
+        .metric-subtitle {
+            font-size: 0.85rem;
+            color: #6B7280;
+            margin-bottom: 12px;
+        }
+
+        .metric-quality {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .quality-excellent {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .quality-good {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .quality-needs_improvement, .quality-needs_review {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .quality-error, .quality-low {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .charts-section {
+            margin-top: 40px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1F2937;
+            text-align: center;
+        }
+
+        .chart-canvas {
+            max-height: 300px;
+        }
+
+        .data-info {
+            margin-top: 30px;
+            text-align: center;
+            color: white;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .time-selector {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .time-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .time-btn {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-btn:hover {
+            background: #1D4ED8;
+            transform: translateY(-1px);
+        }
+
+        .time-btn.active {
+            background: #10B981;
+        }
+
+        .time-btn:disabled {
+            background: #6B7280;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .nav-btn {
+            background: #8B5CF6;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #7C3AED;
+        }
+
+        .nav-btn:disabled {
+            background: #6B7280;
+            cursor: not-allowed;
+        }
+
+        .current-period {
+            font-weight: 600;
+            color: #1F2937;
+            font-size: 1rem;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .custom-date-controls {
+            display: none;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .custom-date-controls.active {
+            display: flex;
+        }
+
+        .date-input {
+            padding: 8px 12px;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            background-color: #1F2937;
+            color: white;
+            text-align: left;
+            border-radius: 8px;
+            padding: 12px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1F2937 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .ltv-highlight {
+            border: 3px solid #10B981;
+            background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ltv-highlight::before {
+            content: "🔥 FIXED!";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #10B981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .chart-container {
+                padding: 16px;
+            }
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Enhanced KPI Dashboard</h1>
+            <p>Healthcare Business Intelligence with Fixed LTV Calculation</p>
+            <button class="refresh-btn" onclick="loadDashboard()" id="refreshBtn">
+                🔄 Refresh Data
+            </button>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading enhanced KPI data...</p>
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="dashboard" style="display: none;">
+            <!-- Time Selector Controls -->
+            <div class="time-selector">
+                <div class="time-controls">
+                    <button class="time-btn" data-period="yesterday">Yesterday</button>
+                    <button class="time-btn active" data-period="weekly">Weekly</button>
+                    <button class="time-btn" data-period="monthly">Monthly</button>
+                    <button class="time-btn" data-period="quarterly">Quarterly</button>
+                    <button class="time-btn" data-period="alltime">All Time</button>
+                    <button class="time-btn" data-period="custom">Custom Range</button>
+                </div>
+
+                <div class="nav-controls" id="navControls">
+                    <button class="nav-btn" id="prevBtn">◀ Previous</button>
+                    <div class="current-period" id="currentPeriod">Current Week</div>
+                    <button class="nav-btn" id="nextBtn">Next ▶</button>
+                </div>
+
+                <div class="custom-date-controls" id="customDateControls">
+                    <label>Start Date:</label>
+                    <input type="date" id="startDate" class="date-input">
+                    <label>End Date:</label>
+                    <input type="date" id="endDate" class="date-input">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="singleDay">
+                        <label for="singleDay">Single Day</label>
+                    </div>
+                    <button class="time-btn" onclick="applyCustomRange()">Apply</button>
+                </div>
+            </div>
+
+            <!-- Snapshot Section - Time Independent -->
+            <div style="margin-bottom: 40px;">
+                <h2 style="color: white; text-align: center; margin-bottom: 20px; font-size: 1.8rem;">
+                    📸 Snapshot Metrics
+                    <span style="font-size: 0.9rem; opacity: 0.8; display: block; margin-top: 8px;">Time-Independent • Updated in Real-Time</span>
+                </h2>
+                <div class="metrics-grid" id="snapshotMetrics">
+                    <!-- Snapshot metrics will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Timed Section - Date Range Sensitive -->
+            <div>
+                <h2 style="color: white; text-align: center; margin-bottom: 20px; font-size: 1.8rem;">
+                    ⏱️ Timed Metrics
+                    <span style="font-size: 0.9rem; opacity: 0.8; display: block; margin-top: 8px;">Date Range Sensitive • Filtered by Selected Period</span>
+                </h2>
+                <div class="metrics-grid" id="timedMetrics">
+                    <!-- Timed metrics will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Revenue Breakdown</h3>
+                        <canvas id="revenueChart" class="chart-canvas"></canvas>
+                    </div>
+
+                    <div class="chart-container">
+                        <h3 class="chart-title">Customer Metrics</h3>
+                        <canvas id="customerChart" class="chart-canvas"></canvas>
+                    </div>
+
+                    <div class="chart-container">
+                        <h3 class="chart-title">Geographic Distribution</h3>
+                        <canvas id="geoChart" class="chart-canvas"></canvas>
+                    </div>
+
+                    <div class="chart-container">
+                        <h3 class="chart-title">Product Performance</h3>
+                        <canvas id="productChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-info" id="dataInfo">
+                <!-- Data quality info will be populated -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let dashboardData = null;
+        let charts = {};
+        let currentPeriodType = 'weekly';
+        let currentPeriodOffset = 0;
+        let customDateRange = null;
+
+        // KPI calculation descriptions for tooltips
+        const kpiDescriptions = {
+            // Snapshot Metrics (Time-Independent)
+            'Active Patients': 'Total count of active subscriptions. Time-independent metric showing current business scale. Counts all subscription records with Status = "active".',
+
+            'Realized CLV (All)': 'Average total historical revenue per customer across ALL customers. Calculated by summing order.total_amount per customer, then averaging. Formula: Sum(order.total_amount per customer) / Total Customers. This is your actual realized customer value, not a prediction.',
+
+            'Realized CLV (Mature)': 'Average total revenue per MATURE customer only (past prepaid cycle or cancelled). Maturity criteria: (1) Cancelled subscription, OR (2) Orders > sale_cycle_duration, OR (3) Orders = sale_cycle_duration AND 1+ months since last order. More accurate CLV predictor than all-customer average.',
+
+            'Mature Customer %': 'Percentage of total customers who are considered mature. Shows what portion of your customer base has completed their initial prepaid period and demonstrated full lifecycle behavior. Higher ratio = more reliable CLV projections. Formula: (Mature Customers / Total Customers) * 100.',
+
+            'Renewal Rate': 'Percentage of mature customers who placed at least one PAID renewal order after their prepaid period ended. Only counts orders with total_amount > 0 placed after the sale_cycle_duration orders. Critical retention metric. Formula: (Renewed Customers / Mature Customers) * 100. Target: 80%+.',
+
+            // Timed Metrics (Date Range Sensitive)
+            'New Patients': 'Counts unique customers with their FIRST checkout order (source="checkout") in the selected time period. Excludes renewal orders. Primary acquisition metric. Date range sensitive - changes based on your selected period.',
+
+            'Geographic Reach': 'Number of unique US states/provinces where customers are located. Based on shipping addresses (address.province_code) from orders in the selected period. Indicates market penetration and regulatory compliance scope.',
+
+            'Monthly Recurring Revenue': 'Total monthly recurring revenue normalized across different billing cycles. Formula: Sum((product.renewal_price * 30) / product.renewal_cycle_duration) for all active subscriptions. Converts all cycles (28-day, 30-day, etc.) to standardized 30-day months. Core SaaS metric.',
+
+            'ARPU': 'Average Revenue Per User - monthly revenue per customer. Calculated as (total customer revenue / months active) averaged across all customers. Months active = CEILING((lastOrderDate - firstOrderDate) / 30 days), minimum 1 month. Part of CLV calculator. Used in Predictive CLV formula.',
+
+            'Net Revenue': 'Total successful payments minus total refunds in the selected period. Shows TRUE revenue after returns. Formula: Sum(payment.amount) - Sum(refund.amount). Also displays refund rate: (Total Refunds / Total Payments) * 100. High refund rates may indicate product/service issues.',
+
+            'Payment Success Rate': 'Percentage of payment attempts that successfully processed in the selected period. Formula: (Successful Payments / Total Payment Attempts) * 100. Successful = payment.amount > 0. Target: 95%+. Low rates indicate payment infrastructure or customer payment method issues.',
+
+            'Churn Rate': 'Monthly customer attrition rate based on last 90 days. Formula (90-day): (Cancellations in last 90 days / Total Subscriptions) * (30 / 90) * 100. If no 90-day data, falls back to all-time: (All Cancellations / Total Subscriptions) * 100. Part of CLV calculator. Lower is better. Target: <5% excellent, <10% good.',
+
+            'Predictive CLV': 'Estimated total FUTURE lifetime value per customer. Formula: ARPU / (Churn Rate / 100). Example: If ARPU = $200/month and Churn = 5% (0.05), then CLV = $200 / 0.05 = $4,000 expected lifetime revenue. Strategic metric for determining maximum acceptable Customer Acquisition Cost (CAC).',
+
+            'Medication Adherence': 'Clinical success metric - percentage of customers enrolled for 90+ days who remain active. Formula: (Adherent Customers / Eligible Customers) * 100. Eligible = subscription created 90+ days ago. Adherent = active status OR completed 90+ days treatment. Clinical target: 80%. Correlates with treatment outcomes and retention.',
+
+            'Order Processing': 'Operational efficiency metric - median time from order creation to order update. Formula: (order.updated_at - order.created_at) / 3600 seconds. Measures in hours. Also shows P90 (90th percentile). Only includes orders processed within 168 hours (1 week) to exclude outliers. Target: Median <24h excellent, <48h good.',
+
+            'Product Performance': 'Revenue and order metrics broken down by product. Shows total number of products tracked, plus top 5 by revenue. For each product: total orders, active subscriptions, revenue (USD), unique customers. Helps identify which offerings drive revenue and inform product strategy.'
+        };
+
+        // Load dashboard data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTimeSelectors();
+            loadDashboard();
+        });
+
+        function initializeTimeSelectors() {
+            // Set up time period buttons
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (this.dataset.period) {
+                        selectTimePeriod(this.dataset.period);
+                    }
+                });
+            });
+
+            // Set up navigation buttons
+            document.getElementById('prevBtn').addEventListener('click', navigatePrevious);
+            document.getElementById('nextBtn').addEventListener('click', navigateNext);
+
+            // Set up single day checkbox
+            document.getElementById('singleDay').addEventListener('change', function() {
+                const endDateInput = document.getElementById('endDate');
+                if (this.checked) {
+                    endDateInput.disabled = true;
+                    endDateInput.value = document.getElementById('startDate').value;
+                } else {
+                    endDateInput.disabled = false;
+                }
+            });
+
+            // Set up date inputs
+            document.getElementById('startDate').addEventListener('change', function() {
+                if (document.getElementById('singleDay').checked) {
+                    document.getElementById('endDate').value = this.value;
+                }
+            });
+
+            updatePeriodDisplay();
+        }
+
+        function selectTimePeriod(period) {
+            // Update active button
+            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-period="${period}"]`).classList.add('active');
+
+            currentPeriodType = period;
+            currentPeriodOffset = 0;
+
+            // Show/hide controls based on period
+            const navControls = document.getElementById('navControls');
+            const customControls = document.getElementById('customDateControls');
+
+            if (period === 'custom') {
+                navControls.style.display = 'none';
+                customControls.classList.add('active');
+            } else if (period === 'yesterday' || period === 'alltime') {
+                navControls.style.display = 'none';
+                customControls.classList.remove('active');
+            } else {
+                navControls.style.display = 'flex';
+                customControls.classList.remove('active');
+            }
+
+            updatePeriodDisplay();
+            loadDashboard();
+        }
+
+        function navigatePrevious() {
+            currentPeriodOffset--;
+            updatePeriodDisplay();
+            loadDashboard();
+        }
+
+        function navigateNext() {
+            if (currentPeriodOffset < 0) {
+                currentPeriodOffset++;
+                updatePeriodDisplay();
+                loadDashboard();
+            }
+        }
+
+        function updatePeriodDisplay() {
+            const periodEl = document.getElementById('currentPeriod');
+            const nextBtn = document.getElementById('nextBtn');
+            const today = new Date();
+
+            let periodText = '';
+            let canGoForward = currentPeriodOffset < 0;
+
+            switch (currentPeriodType) {
+                case 'weekly':
+                    const weekStart = new Date(today);
+                    weekStart.setDate(today.getDate() - today.getDay() + (currentPeriodOffset * 7));
+                    const weekEnd = new Date(weekStart);
+                    weekEnd.setDate(weekStart.getDate() + 6);
+                    periodText = `Week of ${weekStart.toLocaleDateString()} - ${weekEnd.toLocaleDateString()}`;
+                    break;
+                case 'monthly':
+                    const month = new Date(today.getFullYear(), today.getMonth() + currentPeriodOffset, 1);
+                    periodText = month.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                    break;
+                case 'quarterly':
+                    const quarter = Math.floor(today.getMonth() / 3) + 1 + currentPeriodOffset;
+                    const year = today.getFullYear() + Math.floor((quarter - 1) / 4);
+                    const adjustedQuarter = ((quarter - 1) % 4) + 1;
+                    periodText = `Q${adjustedQuarter} ${year}`;
+                    break;
+                default:
+                    periodText = currentPeriodType.charAt(0).toUpperCase() + currentPeriodType.slice(1);
+            }
+
+            periodEl.textContent = periodText;
+            nextBtn.disabled = !canGoForward;
+        }
+
+        function applyCustomRange() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value || startDate;
+
+            if (!startDate) {
+                alert('Please select a start date');
+                return;
+            }
+
+            customDateRange = {
+                start: new Date(startDate),
+                end: new Date(endDate)
+            };
+
+            loadDashboard();
+        }
+
+        function getDateRange() {
+            const today = new Date();
+
+            switch (currentPeriodType) {
+                case 'yesterday':
+                    const yesterday = new Date(today);
+                    yesterday.setDate(today.getDate() - 1);
+                    return { start: yesterday, end: yesterday };
+
+                case 'weekly':
+                    const weekStart = new Date(today);
+                    weekStart.setDate(today.getDate() - today.getDay() + (currentPeriodOffset * 7));
+                    const weekEnd = new Date(weekStart);
+                    weekEnd.setDate(weekStart.getDate() + 6);
+                    return { start: weekStart, end: weekEnd };
+
+                case 'monthly':
+                    const monthStart = new Date(today.getFullYear(), today.getMonth() + currentPeriodOffset, 1);
+                    const monthEnd = new Date(today.getFullYear(), today.getMonth() + currentPeriodOffset + 1, 0);
+                    return { start: monthStart, end: monthEnd };
+
+                case 'quarterly':
+                    const quarterMonth = Math.floor(today.getMonth() / 3) * 3 + (currentPeriodOffset * 3);
+                    const quarterStart = new Date(today.getFullYear(), quarterMonth, 1);
+                    const quarterEnd = new Date(today.getFullYear(), quarterMonth + 3, 0);
+                    return { start: quarterStart, end: quarterEnd };
+
+                case 'custom':
+                    return customDateRange || { start: today, end: today };
+
+                case 'alltime':
+                default:
+                    return { start: new Date('2020-01-01'), end: today };
+            }
+        }
+
+        function loadDashboard() {
+            const loadingEl = document.getElementById('loading');
+            const errorEl = document.getElementById('error');
+            const dashboardEl = document.getElementById('dashboard');
+            const refreshBtn = document.getElementById('refreshBtn');
+
+            // Show loading state
+            loadingEl.style.display = 'block';
+            errorEl.style.display = 'none';
+            dashboardEl.style.display = 'none';
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = '🔄 Loading...';
+
+            // Get current date range
+            const dateRange = getDateRange();
+
+            // Call Apps Script function with date range
+            try {
+                if (currentPeriodType === 'weekly' && currentPeriodOffset === 0) {
+                    // For default weekly view, use simple call for compatibility
+                    google.script.run
+                        .withSuccessHandler(onDataLoaded)
+                        .withFailureHandler(onDataError)
+                        .getEnhancedKPIs('weekly');
+                } else {
+                    // Use date range for other cases
+                    google.script.run
+                        .withSuccessHandler(onDataLoaded)
+                        .withFailureHandler(onDataError)
+                        .getEnhancedKPIs(currentPeriodType, dateRange.start.toISOString(), dateRange.end.toISOString());
+                }
+            } catch (callError) {
+                console.error('Error calling Apps Script:', callError);
+                onDataError(callError);
+            }
+        }
+
+        function onDataLoaded(data) {
+            console.log('Dashboard data loaded:', data);
+
+            const loadingEl = document.getElementById('loading');
+            const errorEl = document.getElementById('error');
+            const dashboardEl = document.getElementById('dashboard');
+            const refreshBtn = document.getElementById('refreshBtn');
+
+            loadingEl.style.display = 'none';
+            refreshBtn.disabled = false;
+            refreshBtn.textContent = '🔄 Refresh Data';
+
+            if (data && data.error) {
+                showError('Error loading data: ' + data.message + (data.debug ? '. Debug: ' + JSON.stringify(data.debug) : ''));
+                return;
+            }
+
+            if (!data) {
+                showError('No data received from server. Please try refreshing.');
+                return;
+            }
+
+            dashboardData = data;
+
+            try {
+                renderDashboard(data);
+                dashboardEl.style.display = 'block';
+                errorEl.style.display = 'none';
+
+                // Show fallback mode warning if applicable
+                if (data.fallbackMode) {
+                    console.warn('Dashboard running in fallback mode - some date filtering may not work');
+                }
+            } catch (renderError) {
+                console.error('Error rendering dashboard:', renderError);
+                showError('Error displaying dashboard: ' + renderError.message);
+            }
+        }
+
+        function onDataError(error) {
+            console.error('Error loading dashboard data:', error);
+            showError('Failed to load dashboard data: ' + error.message);
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('refreshBtn').disabled = false;
+            document.getElementById('refreshBtn').textContent = '🔄 Refresh Data';
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('error');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+
+        function renderDashboard(data) {
+            renderMetrics(data);
+            renderCharts(data);
+            renderDataInfo(data);
+        }
+
+        function renderMetrics(data) {
+            const snapshotGrid = document.getElementById('snapshotMetrics');
+            const timedGrid = document.getElementById('timedMetrics');
+
+            // Snapshot Metrics (Time-Independent)
+            const snapshotMetrics = [
+                {
+                    title: 'Active Patients',
+                    icon: '💚',
+                    value: data.snapshot.activePatients.count,
+                    subtitle: 'Current Active Subscriptions',
+                    quality: data.snapshot.activePatients.quality
+                },
+                {
+                    title: 'Realized CLV (All)',
+                    icon: '💰',
+                    value: '$' + data.snapshot.realizedCLV_all.amount.toLocaleString(),
+                    subtitle: data.snapshot.realizedCLV_all.description || 'Avg revenue per customer',
+                    quality: data.snapshot.realizedCLV_all.quality,
+                    special: 'ltv-highlight'
+                },
+                {
+                    title: 'Realized CLV (Mature)',
+                    icon: '⭐',
+                    value: '$' + data.snapshot.realizedCLV_mature.amount.toLocaleString(),
+                    subtitle: data.snapshot.realizedCLV_mature.description || 'Avg revenue per mature customer',
+                    quality: data.snapshot.realizedCLV_mature.quality,
+                    special: 'ltv-highlight'
+                },
+                {
+                    title: 'Mature Customer %',
+                    icon: '📊',
+                    value: data.snapshot.matureCustomerRatio.percentage.toFixed(1) + '%',
+                    subtitle: `${data.snapshot.matureCustomerRatio.matureCount || '?'} of ${data.snapshot.matureCustomerRatio.totalCount || '?'} customers`,
+                    quality: data.snapshot.matureCustomerRatio.quality
+                },
+                {
+                    title: 'Renewal Rate',
+                    icon: '🔄',
+                    value: data.snapshot.renewalRate.rate.toFixed(1) + '%',
+                    subtitle: `${data.snapshot.renewalRate.renewedCustomers} of ${data.snapshot.renewalRate.matureCustomers} renewed`,
+                    quality: data.snapshot.renewalRate.quality
+                }
+            ];
+
+            // Timed Metrics (Date Range Sensitive)
+            const timedMetrics = [
+                {
+                    title: 'New Patients',
+                    icon: '👥',
+                    value: data.timed.newPatients.count,
+                    subtitle: data.timed.newPatients.methodology || 'First checkout in period',
+                    quality: data.timed.newPatients.quality
+                },
+                {
+                    title: 'Geographic Reach',
+                    icon: '🌍',
+                    value: data.timed.geographicReach.stateCount,
+                    subtitle: 'States/Provinces',
+                    quality: data.timed.geographicReach.quality
+                },
+                {
+                    title: 'Monthly Recurring Revenue',
+                    icon: '💵',
+                    value: '$' + data.timed.mrr.amount.toLocaleString(),
+                    subtitle: 'Normalized MRR',
+                    quality: data.timed.mrr.quality
+                },
+                {
+                    title: 'ARPU',
+                    icon: '📈',
+                    value: '$' + data.timed.arpu.amount.toLocaleString(),
+                    subtitle: data.timed.arpu.description || 'Monthly revenue per user',
+                    quality: data.timed.arpu.quality
+                },
+                {
+                    title: 'Churn Rate',
+                    icon: '📉',
+                    value: data.timed.churnRate.rate + '%',
+                    subtitle: data.timed.churnRate.methodology || 'Last 90 days',
+                    quality: data.timed.churnRate.quality
+                },
+                {
+                    title: 'Predictive CLV',
+                    icon: '🔮',
+                    value: data.timed.predictiveCLV.amount ? '$' + data.timed.predictiveCLV.amount.toLocaleString() : 'N/A',
+                    subtitle: data.timed.predictiveCLV.description || 'Estimated lifetime value',
+                    quality: data.timed.predictiveCLV.quality,
+                    special: 'ltv-highlight'
+                },
+                {
+                    title: 'Net Revenue',
+                    icon: '💲',
+                    value: '$' + data.timed.netRevenue.amount.toLocaleString(),
+                    subtitle: `Refund Rate: ${data.timed.netRevenue.refundRate}%`,
+                    quality: data.timed.netRevenue.quality
+                },
+                {
+                    title: 'Payment Success Rate',
+                    icon: '✅',
+                    value: data.timed.paymentSuccessRate.rate + '%',
+                    subtitle: `${data.timed.paymentSuccessRate.successfulPayments} of ${data.timed.paymentSuccessRate.totalPayments}`,
+                    quality: data.timed.paymentSuccessRate.quality
+                },
+                {
+                    title: 'Medication Adherence',
+                    icon: '💊',
+                    value: data.timed.adherenceRate.rate + '%',
+                    subtitle: `Target: ${data.timed.adherenceRate.clinicalTarget}%`,
+                    quality: data.timed.adherenceRate.quality
+                },
+                {
+                    title: 'Order Processing',
+                    icon: '⚡',
+                    value: data.timed.processingEfficiency.median + 'h',
+                    subtitle: `Median Time (n=${data.timed.processingEfficiency.sampleSize})`,
+                    quality: data.timed.processingEfficiency.quality
+                },
+                {
+                    title: 'Product Performance',
+                    icon: '🏷️',
+                    value: data.timed.productPerformance.totalProducts,
+                    subtitle: 'Products Tracked',
+                    quality: data.timed.productPerformance.quality
+                }
+            ];
+
+            // Render snapshot metrics
+            snapshotGrid.innerHTML = snapshotMetrics.map(metric => `
+                <div class="metric-card ${metric.special || ''} tooltip">
+                    <div class="metric-header">
+                        <span class="metric-title">${metric.title}</span>
+                        <span class="metric-icon">${metric.icon}</span>
+                    </div>
+                    <div class="metric-value">${metric.value}</div>
+                    <div class="metric-subtitle">${metric.subtitle}</div>
+                    <span class="metric-quality quality-${metric.quality}">${metric.quality.replace('_', ' ')}</span>
+                    <span class="tooltiptext">${kpiDescriptions[metric.title] || 'Calculation description not available.'}</span>
+                </div>
+            `).join('');
+
+            // Render timed metrics
+            timedGrid.innerHTML = timedMetrics.map(metric => `
+                <div class="metric-card ${metric.special || ''} tooltip">
+                    <div class="metric-header">
+                        <span class="metric-title">${metric.title}</span>
+                        <span class="metric-icon">${metric.icon}</span>
+                    </div>
+                    <div class="metric-value">${metric.value}</div>
+                    <div class="metric-subtitle">${metric.subtitle}</div>
+                    <span class="metric-quality quality-${metric.quality}">${metric.quality.replace('_', ' ')}</span>
+                    <span class="tooltiptext">${kpiDescriptions[metric.title] || 'Calculation description not available.'}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderCharts(data) {
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => {
+                if (chart) chart.destroy();
+            });
+
+            // Revenue Breakdown Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            charts.revenue = new Chart(revenueCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Payments', 'Refunds', 'Net Revenue'],
+                    datasets: [{
+                        data: [
+                            data.timed.netRevenue.totalPayments,
+                            data.timed.netRevenue.totalRefunds,
+                            data.timed.netRevenue.amount
+                        ],
+                        backgroundColor: ['#10B981', '#EF4444', '#3B82F6'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Customer Metrics Chart
+            const customerCtx = document.getElementById('customerChart').getContext('2d');
+            charts.customer = new Chart(customerCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['New Patients', 'Active Patients', 'Active Subscriptions'],
+                    datasets: [{
+                        label: 'Count',
+                        data: [
+                            data.timed.newPatients.count,
+                            data.snapshot.activePatients.count,
+                            data.timed.mrr.activeSubscriptions
+                        ],
+                        backgroundColor: ['#8B5CF6', '#10B981', '#F59E0B'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Geographic Distribution Chart
+            const geoCtx = document.getElementById('geoChart').getContext('2d');
+            const topStates = data.timed.geographicReach.states.slice(0, 10);
+            charts.geo = new Chart(geoCtx, {
+                type: 'bar',
+                data: {
+                    labels: topStates,
+                    datasets: [{
+                        label: 'States/Provinces Served',
+                        data: topStates.map(() => 1), // Simple count for now
+                        backgroundColor: '#3B82F6',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Product Performance Chart
+            const productCtx = document.getElementById('productChart').getContext('2d');
+            const topProducts = data.timed.productPerformance.topProducts.slice(0, 5);
+            charts.product = new Chart(productCtx, {
+                type: 'bar',
+                data: {
+                    labels: topProducts.map(p => p.name),
+                    datasets: [{
+                        label: 'Revenue ($)',
+                        data: topProducts.map(p => p.revenue),
+                        backgroundColor: '#F59E0B',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderDataInfo(data) {
+            const dataInfo = document.getElementById('dataInfo');
+            const quality = data.dataQuality;
+
+            dataInfo.innerHTML = `
+                <p><strong>Data Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>
+                <p><strong>Data Quality:</strong> ${quality.overall} |
+                Customers: ${quality.customers} | Orders: ${quality.orders} |
+                Payments: ${quality.payments} | Subscriptions: ${quality.subscriptions}</p>
+                <p><strong>CLV Metrics:</strong> Realized (All): $${data.snapshot.realizedCLV_all.amount.toLocaleString()} |
+                Realized (Mature): $${data.snapshot.realizedCLV_mature.amount.toLocaleString()} |
+                Predictive: ${data.timed.predictiveCLV.amount ? '$' + data.timed.predictiveCLV.amount.toLocaleString() : 'N/A'}</p>
+                <p><strong>Mature Customers:</strong> ${data.snapshot.matureCustomerRatio.percentage.toFixed(1)}%
+                (${data.snapshot.matureCustomerRatio.matureCount} of ${data.snapshot.matureCustomerRatio.totalCount})</p>
+            `;
+        }
+    </script>
+</body>
+</html>

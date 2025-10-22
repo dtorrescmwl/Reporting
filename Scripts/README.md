@@ -10,10 +10,21 @@ This directory contains all automation and data processing scripts organized by 
 - `test_entries_exclusion.txt` - Test entry IDs to exclude from reporting
 - `funnel_list.txt` - Reference list of available funnels
 
-### `/DataProcessing/`  
+### `/DataProcessing/`
 **Data analysis and processing utilities**
 - `examine_submissions_data.py` - Data quality analysis and exploration
 - `update_database_subscriptions.py` - Clean and merge subscription data from EXTRA_subscriptions.xlsx
+- `merge_extended_records.py` - ✅ **PRODUCTION** Merge extended orders/customers from CSV into Database_CarePortals.xlsx
+  - **Purpose**: Integrates 224 extended records into main database
+  - **Results**: +177 orders and +146 customers successfully merged (Sep 8, 2025)
+  - **Features**: Deduplication, field mapping, data integrity protection
+  - **Documentation**: `/SystemDocumentation/EXTENDED_RECORDS_MERGE_GUIDE.md`
+- **OrdersWebhook/**: Order status tracking data conversion tools
+  - `convert_order_updated_format.py` - Converts CSV to webhook format for order.updated processing
+  - **Current Database**: Database_CarePortals.xlsx with 3,081 order.updated records
+- **Stripe/**: Stripe payment data integration
+  - `stripe_exporter.py` - Historical payment/refund data extraction
+  - **Integration**: Links with real-time webhook processing
 
 ### `/Utilities/`
 **System maintenance and utility scripts**
@@ -41,6 +52,9 @@ python3 Scripts/Embeddables/embeddables_multi_funnel_extractor.py --checkout-onl
 ```bash
 # Examine submission data quality
 python3 Scripts/DataProcessing/examine_submissions_data.py
+
+# Merge extended records into Database_CarePortals.xlsx
+python3 Scripts/DataProcessing/merge_extended_records.py
 ```
 
 ### System Maintenance

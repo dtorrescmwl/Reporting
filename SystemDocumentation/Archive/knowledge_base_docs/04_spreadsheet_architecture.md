@@ -229,8 +229,10 @@ Same structure as `subscription.paused`
 
 ## Spreadsheet 3: Database CarePortals (Normalized)
 **Spreadsheet ID**: `1PaCOgNJmKSb2VsJjCMjWpCG-gwrO7uVkuTAFUdrV-_o`
-**Purpose**: Normalized relational database structure
+**Purpose**: Normalized relational database structure with real-time order tracking
 **Webhook Endpoint**: `https://script.google.com/macros/s/AKfycbywGZUxTowWHtvwRlrgmU9jl6aX5mICc6NkV2kFzbg5DLoTnG8cTcxdEvZ8isLVeH__/exec`
+**Current Status**: 16 sheets with 5,100+ total records
+**Complete Schema**: See `/GoogleSheets/DATABASE_CAREPORTALS_SCHEMA.md` for detailed documentation
 
 ### Sheet: `customers`
 **Purpose**: Customer master data (deduplicated by email)
@@ -325,6 +327,39 @@ Same structure as `subscription.paused`
 - Links to customer, address, product, and coupon entities
 - Maintains referential integrity through upsert logic
 - Prevents orphaned records through validation
+
+### Sheet: `order.updated` 🆕 **NEW FEATURE**
+**Purpose**: Real-time order status tracking and lifecycle management
+**Webhook Endpoint**: Connected to customer support order tracking system
+**Records**: 3,081 status change events
+
+#### Column Structure (4 columns):
+1. **Datetime Created** - Original order creation time (Eastern Time)
+2. **Datetime Updated** - Status update timestamp (Eastern Time)
+3. **order_id** - Order identifier (links to order.created)
+4. **updated_status** - New order status
+
+#### Business Logic:
+- **Real-time Updates**: Processes order.status_updated webhooks immediately
+- **Status Tracking**: Complete audit trail of all order lifecycle changes
+- **Integration**: Connected to customer support systems for live order tracking
+- **High Volume**: 3,081 records demonstrate active order processing
+- **Foreign Key**: order_id links to order.created table
+
+#### Status Values:
+- awaiting_payment
+- awaiting_script
+- awaiting_shipment
+- shipped
+- delivered
+- cancelled
+- refunded
+
+#### Integration Points:
+- Connected to customer_support_order_tracking.js
+- Real-time webhook processing with <500ms latency
+- Provides complete order lifecycle visibility
+- Enables customer support dashboard functionality
 
 ## Data Processing Pipeline
 

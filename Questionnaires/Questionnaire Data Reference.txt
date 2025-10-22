@@ -1,0 +1,399 @@
+Questionnaire Data Reference
+The Questionnaire event contains the data from medical questionnaires sent to the patients.
+
+Questionnaire Event Payload
+The payload below is a representation of a Questionnaire event.
+
+The payload is based on a questionnaire.submitted event, but it is relevant for all Questionnaire-based events. See the Workflow Events/Triggers article for a full list of available events.
+
+------------------------------
+
+{
+    "_id": "6894ea8af81713aa266d7b76",
+    "organization": "cmwl",
+    "type": "wlusmonthly",
+    "internal": false,
+    "customer": {
+        "_id": "686b1dc729eeb73cf1f9558c",
+        "organization": "cmwl",
+        "uname": "johndoe@example.com#cmwl",
+        "email": "johndoe@example.com",
+        "phone": "+15555555555",
+        "firstName": "John",
+        "lastName": "Doe",
+        "gender": "male",
+        "dob": "1959-09-09",
+        "addresses": [
+            {
+                "address1": "123 Main St",
+                "address2": "",
+                "city": "Anytown",
+                "provinceCode": "NY",
+                "postalCode": "12345"
+            }
+        ],
+        "defaultAddress": {
+            "address1": "123 Main St",
+            "address2": "",
+            "city": "Anytown",
+            "provinceCode": "NY",
+            "postalCode": "12345"
+        },
+        "referrer": "",
+        "identifiers": [],
+        "notificationsCount": 0,
+        "watchlist": [],
+        "usedCoupons": [
+            "50GLP1",
+            ""
+        ],
+        "source": "signup",
+        "assignedQuestionnaires": [],
+        "providers": [],
+        "groups": [],
+        "isInsuranceAvailable": false,
+        "acceptMarketing": true,
+        "createdAt": "2025-07-07T01:07:19.921Z",
+        "updatedAt": "2025-07-07T14:35:21.506Z",
+        "__v": 0,
+        "stripeId": "cus_SdKBOD5pdpnbH8"
+    },
+    "status": "new",
+    "statusHistory": [
+        {
+            "prevStatus": "incomplete",
+            "newStatus": "new",
+            "updatedAt": "2025-08-07T18:07:02.716Z",
+            "userId": "customer"
+        }
+    ],
+    "answers": {
+        "states": {},
+        "wlusFollowup_genderIdentify": {
+            "wlusFollowup_genderIdentify_male": true
+        },
+        "previousWeightlossDrug": {
+            "din": "SbDHGzORF0nULsLSgIqKfc4t5hfCa3I1",
+            "name": "Tirzepatide/B6 (10mg/25mg per ml) (3 ml vial)",
+            "extras": {
+                "drugTitration": "alternative",
+                "category": "Weightloss3",
+                "dosageType": "maintenance",
+                "additive": [
+                    "B6"
+                ]
+            }
+        },
+        "wlusFollowup_weightAndHeight2025": {
+            "heightUnit": "feetIn",
+            "weightUnit": "lbs",
+            "feet": 5,
+            "inches": 10,
+            "weight": 222
+        },
+        "wlusFollowup_healthChangesMedicationChanges2025": {
+            "no": true
+        },
+        "wlusFollowup_whenDidYouLastTakeYourPrescribedWeightLossMedication": {
+            "wlusFollowup_whenDidYouLastTakeYourPrescribedWeightLossMedication_withinThePastWeek": true
+        },
+        "wlusFollowup_dateOfLastUse": {
+            "wlusFollowup_dateOfLastUse": "Monday, August 4, 2025"
+        },
+        "wlusFollowup_identifyClosestDose": {
+            "tirzepatide_6mg": true
+        },
+        "wlusFollowup_haveYouExperiencedSideEffectsFromYourCurrentMedication": {
+            "wlusFollowup_haveYouExperiencedSideEffectsFromYourCurrentMedication_no": true
+        },
+        "wlusFollowup_medicationExperience2025": {
+            "yes_weightloss_no_sideEffects": true
+        },
+        "wlusFollowup_reducationInCravings2025": {
+            "noDifference": true
+        },
+        "wlusFollowup_continueTreatment2025": {
+            "maintain": true
+        },
+        "wlusFollowup_otherInformationOrQuestionsDoYouHaveForTheDoctor": {
+            "wlusFollowup_otherInformationOrQuestionsDoYouHaveForTheDoctor": "None"
+        },
+        "wlusFollowup_consentCompounded": {
+            "consent": true
+        },
+        "wlusFollowup_consentTruthfulness": {
+            "wlusFollowup_consentTruthfulness_consent": true
+        },
+        "wlusFollowup_consentGLP1GIP": {
+            "wlusFollowup_consentGLP1GIP_consent": true
+        },
+        "wlusFollowup_complete": {}
+    },
+    "orderIds": [],
+    "createdAt": "2025-08-07T18:03:54.522Z",
+    "updatedAt": "2025-08-07T18:07:02.717Z",
+    "__v": 0
+}
+
+
+-----------------------------------
+
+
+
+Properties Descriptions
+The table below describes the parameters of the payload.
+
+Column
+
+Type
+
+Description
+
+_id
+
+String
+
+A unique identifier for the record.
+
+organization
+
+String
+
+The organization associated with the record.
+
+type
+
+String
+
+The type of record.
+
+internal
+
+Boolean
+
+Indicates if the record is internal.
+
+customer
+
+Object
+
+An object containing customer details.
+
+customer._id
+
+String
+
+The unique identifier for the customer.
+
+customer.organization
+
+String
+
+The organization the customer belongs to.
+
+customer.uname
+
+String
+
+The customer's username, which is a combination of their email and the organization.
+
+customer.email
+
+String
+
+The customer's email address.
+
+customer.phone
+
+String
+
+The customer's phone number.
+
+customer.firstName
+
+String
+
+The customer's first name.
+
+customer.lastName
+
+String
+
+The customer's last name.
+
+customer.gender
+
+String
+
+The customer's gender.
+
+customer.dob
+
+String
+
+The customer's date of birth in YYYY-MM-DD format.
+
+customer.addresses
+
+Array of Objects
+
+A list of the customer's addresses.
+
+customer.defaultAddress
+
+Object
+
+The customer's preferred address.
+
+customer.referrer
+
+String
+
+Information about how the customer was referred.
+
+customer.identifiers
+
+Array
+
+A list of identifiers for the customer.
+
+customer.notificationsCount
+
+Number
+
+The number of notifications for the customer.
+
+customer.watchlist
+
+Array
+
+A list of items on the customer's watchlist.
+
+customer.usedCoupons
+
+Array of Strings
+
+A list of coupon codes the customer has used.
+
+customer.source
+
+String
+
+The source of the customer sign-up.
+
+customer.assignedQuestionnaires
+
+Array
+
+A list of questionnaires assigned to the customer.
+
+customer.providers
+
+Array
+
+A list of providers associated with the customer.
+
+customer.groups
+
+Array
+
+A list of groups the customer belongs to.
+
+customer.isInsuranceAvailable
+
+Boolean
+
+Indicates if insurance is available for the customer.
+
+customer.acceptMarketing
+
+Boolean
+
+Indicates if the customer accepts marketing communications.
+
+customer.createdAt
+
+String
+
+The timestamp when the customer record was created.
+
+customer.updatedAt
+
+String
+
+The timestamp when the customer record was last updated.
+
+customer.__v
+
+Number
+
+The version key of the customer document.
+
+customer.stripeId
+
+String
+
+The customer's ID in the Stripe payment system.
+
+status
+
+String
+
+The current status of the record.
+
+statusHistory
+
+Array of Objects
+
+A chronological history of status changes for the record.
+
+answers
+
+Object
+
+An object containing the customer's answers to the questionnaire. See the answers Object section for more details.
+
+orderIds
+
+Array
+
+A list of associated order identifiers.
+
+createdAt
+
+String
+
+The timestamp when the record was created.
+
+updatedAt
+
+String
+
+The timestamp when the record was last updated.
+
+__v
+
+Number
+
+The version key of the document.
+
+answers Object
+The answers property is a dynamic object that holds a patient's responses to a questionnaire. The structure and content change based on the questions asked and the patient's answers.
+
+Each key in the payload corresponds to a specific question, whose type can be identified. See the different types of answers below:
+
+Single/Multi-Select: Answers are nested objects where the inner key indicates the chosen option, and the value is true.
+
+"wlus_consentPregnancy": { "wlus_consentPregnancy_consent": true } 
+Text Field: Answers are nested objects where the key is the question identifier and the value is the patient's text input.
+
+"wlusFollowup_otherInformationOrQuestionsDoYouHaveForTheDoctor": { "wlusFollowup_otherInformationOrQuestionsDoYouHaveForTheDoctor": "None" } 
+Calculated Fields: These objects contain raw, uncalculated values (e.g., height and weight) that are used to compute a final result like BMI. The format varies for each type of calculated field.
+
+"wlus_weightAndHeight2025": { "weightUnit": "lbs", "weight": 169 } 
+File Upload: The answer is a direct string that is a link to the uploaded file's location in the database. This link is not publicly accessible.
+
+"govIdUs": "<https://appgen-health-crm-files>..." 
+The wlusFollowup_ prefix is used to identify the specific questionnaire, distinguishing between overlapping questions that may have different versions across various questionnaires.
+
+The answers payload is dynamic. Questions and their corresponding answers are only included if they were part of the patient's questionnaire and were answered. For example, male patients will not have a pregnancy consent question in their payload.

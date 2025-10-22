@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare KPI Dashboard - Complete Definitions Guide</title>
+    <style>
+        @media print {
+            @page {
+                size: A4;
+                margin: 2cm;
+            }
+
+            body {
+                font-size: 10pt;
+            }
+
+            h1 {
+                page-break-before: always;
+            }
+
+            h1:first-of-type {
+                page-break-before: avoid;
+            }
+
+            h1, h2, h3, h4 {
+                page-break-after: avoid;
+            }
+
+            pre, .code-block {
+                page-break-inside: avoid;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-top: 0;
+            margin-bottom: 0.5em;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 0.3em;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.2em;
+        }
+
+        h3 {
+            color: #34495e;
+            font-size: 1.4em;
+            margin-top: 1.2em;
+            margin-bottom: 0.4em;
+        }
+
+        h4 {
+            color: #555;
+            font-size: 1.1em;
+            margin-top: 1em;
+            margin-bottom: 0.3em;
+        }
+
+        p {
+            margin: 0.8em 0;
+        }
+
+        strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c7254e;
+        }
+
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            color: #333;
+            font-size: 0.85em;
+        }
+
+        ul, ol {
+            margin: 0.8em 0;
+            padding-left: 2em;
+        }
+
+        li {
+            margin: 0.4em 0;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 2em 0;
+        }
+
+        .metadata {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 1.5em 0;
+            border-left: 4px solid #3498db;
+        }
+
+        .toc {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 2em 0;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            margin: 0.5em 0;
+        }
+
+        .toc a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .print-btn:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn no-print" onclick="window.print()">🖨️ Print to PDF</button>
+
+    <h1>Healthcare KPI Dashboard - Complete Definitions Guide</h1>
+
+    <div class="metadata">
+        <p><strong>Document Version:</strong> 1.0</p>
+        <p><strong>Last Updated:</strong> 2025-10-22</p>
+        <p><strong>Data Source:</strong> Database_CarePortals.xlsx</p>
+        <p><strong>Dashboard URL:</strong> <a href="https://script.google.com/a/macros/cmwlvirtual.com/s/AKfycbw7pUMTMbSMdwnot8NpC8W7H3UzFvjDwl6_Rx03oYyyFubFGYowKmpg_deRtmnDght-5A/exec" target="_blank">View Dashboard</a></p>
+    </div>
+
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#summary-statistics">1. Summary Statistics</a></li>
+            <li><a href="#snapshot-metrics">2. Snapshot Metrics (Time-Independent)</a></li>
+            <li><a href="#timed-metrics">3. Timed Metrics (Date Range Sensitive)</a></li>
+            <li><a href="#data-quality">4. Data Quality Indicators</a></li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <h2 id="summary-statistics">Summary Statistics</h2>
+    <p>These high-level metrics appear at the top of the dashboard and provide quick insights into the business.</p>
+
+    <h3>1. Total Customers</h3>
+    <p><strong>What it is:</strong> The total number of unique customers in the system.</p>
+    <p><strong>What it means:</strong> Represents the complete customer base that has ever interacted with the business.</p>
+    <p><strong>How it's calculated:</strong></p>
+    <pre><code>data.customers.length</code></pre>
+    <p><strong>Data Source:</strong> <code>customers</code> sheet</p>
+    <p><strong>Quality Indicator:</strong> Good if > 10 customers</p>
+
+    <h3>2. Active Subscriptions</h3>
+    <p><strong>What it is:</strong> The count of currently active subscription records.</p>
+    <p><strong>What it means:</strong> Indicates the number of subscriptions that are currently generating recurring revenue.</p>
+    <p><strong>How it's calculated:</strong></p>
+    <pre><code>data.subscriptions.filter(s => s.Status === 'active').length</code></pre>
+    <p><strong>Data Source:</strong> <code>subscription.active</code> sheet</p>
+    <p><strong>Filter Criteria:</strong> <code>Status = 'active'</code></p>
+    <p><strong>Quality Indicator:</strong> Higher is better; indicates healthy recurring revenue base</p>
+
+    <h3>3. Total Orders</h3>
+    <p><strong>What it is:</strong> The cumulative count of all orders ever placed.</p>
+    <p><strong>What it means:</strong> Represents the total transaction volume across all time.</p>
+    <p><strong>How it's calculated:</strong></p>
+    <pre><code>data.orders.length</code></pre>
+    <p><strong>Data Source:</strong> <code>order.created</code> sheet</p>
+    <p><strong>Quality Indicator:</strong> Good if > 10 orders</p>
+
+    <h3>4. Total Revenue</h3>
+    <p><strong>What it is:</strong> The sum of all successful payments.</p>
+    <p><strong>What it means:</strong> Gross revenue generated before refunds.</p>
+    <p><strong>How it's calculated:</strong></p>
+    <pre><code>data.payments.reduce((sum, payment) => {
+  return sum + (parseFloat(payment.amount) || 0);
+}, 0)</code></pre>
+    <p><strong>Data Source:</strong> <code>payment_succesful</code> sheet</p>
+    <p><strong>Formula:</strong> Sum(payment.amount) for all payments</p>
+    <p><strong>Display Format:</strong> Currency (USD) with comma separators</p>
+
+    <hr>
+
+    <h2 id="snapshot-metrics">Snapshot Metrics (Time-Independent)</h2>
+    <p>These metrics represent the current state of the business and are not filtered by date range.</p>
+
+    <h3>5. Active Patients</h3>
+    <p><strong>Section:</strong> Clinical & Patient Success</p>
+    <p><strong>What it is:</strong> Count of subscriptions with active status.</p>
+    <p><strong>What it means:</strong> Number of patients currently enrolled in treatment programs.</p>
+    <p><strong>How it's calculated:</strong></p>
+    <pre><code>data.subscriptions.filter(s => s.Status === 'active').length</code></pre>
+    <p><strong>Data Source:</strong> <code>subscription.active</code> sheet</p>
+    <p><strong>Filter:</strong> <code>Status = 'active'</code></p>
+    <p><strong>Quality Indicator:</strong> 'good' quality</p>
+    <p><strong>Clinical Significance:</strong> Represents active patient census</p>
+
+    <h3>6. Realized CLV (All Customers)</h3>
+    <p><strong>Section:</strong> Growth & Revenue Metrics</p>
+    <p><strong>What it is:</strong> Average total revenue generated per customer across all customers.</p>
+    <p><strong>What it means:</strong> Historical customer value based on actual transactions, not predictions.</p>
+    <p><strong>How it's calculated:</strong></p>
+    <pre><code>// Step 1: Group orders by customer and sum revenue
+const customers = {};
+data.orders.forEach(order => {
+  const customerId = order.customer_id;
+  if (!customerId) return;
+
+  const amount = parseFloat(order.total_amount) || 0;
+  if (!customers[customerId]) {
+    customers[customerId] = { totalRevenue: 0 };
+  }
+  customers[customerId].totalRevenue += amount;
+});
+
+// Step 2: Calculate average
+let totalRevenue = 0;
+let customerCount = 0;
+
+Object.keys(customers).forEach(customerId => {
+  totalRevenue += customers[customerId].totalRevenue;
+  customerCount++;
+});
+
+const realizedCLV_all = customerCount > 0 ? totalRevenue / customerCount : 0;</code></pre>
+    <p><strong>Formula:</strong> <code>Sum(order.total_amount per customer) / Total Customers</code></p>
+    <p><strong>Data Sources:</strong> <code>order.created</code> sheet (order.total_amount, customer_id)</p>
+    <p><strong>Methodology:</strong> Sum of all order amounts per customer, averaged across all customers</p>
+    <p><strong>Quality Indicator:</strong> 'good' quality when sufficient data exists</p>
+    <p><strong>Business Significance:</strong> Shows actual revenue per customer relationship</p>
+
+    <h3>7. Realized CLV (Mature Customers)</h3>
+    <p><strong>Section:</strong> Growth & Revenue Metrics</p>
+    <p><strong>What it is:</strong> Average total revenue per customer who has completed their initial prepaid period or cancelled.</p>
+    <p><strong>What it means:</strong> More accurate CLV metric focusing only on customers who have had time to demonstrate their full lifecycle value.</p>
+    <p><strong>Maturity Criteria:</strong></p>
+    <ol>
+        <li>Customer has cancelled subscription, OR</li>
+        <li>Customer has paused subscription = FALSE, AND</li>
+        <li>Number of orders > sale_cycle_duration (prepaid period), OR</li>
+        <li>Number of orders = sale_cycle_duration AND 1+ months since last order</li>
+    </ol>
+    <p><strong>Formula:</strong> <code>Sum(order.total_amount for mature customers) / Count(mature customers)</code></p>
+    <p><strong>Data Sources:</strong></p>
+    <ul>
+        <li><code>order.created</code> sheet (total_amount, customer_id, created_at)</li>
+        <li><code>subscription.cancelled</code> sheet (customer_id)</li>
+        <li><code>subscription.paused</code> sheet (customer_id)</li>
+        <li><code>products</code> sheet (sale_cycle_duration)</li>
+    </ul>
+    <p><strong>Quality Indicator:</strong> 'good' quality when sufficient mature customers exist</p>
+    <p><strong>Business Significance:</strong> More accurate predictor of long-term customer value than all-customer CLV</p>
+
+    <h3>8. Mature Customer Ratio</h3>
+    <p><strong>Section:</strong> Growth & Revenue Metrics</p>
+    <p><strong>What it is:</strong> Percentage of customers who have reached maturity status.</p>
+    <p><strong>What it means:</strong> Indicates how much of the customer base has been around long enough to demonstrate full lifecycle behavior.</p>
+    <p><strong>Formula:</strong> <code>(Mature Customers / Total Customers) * 100</code></p>
+    <p><strong>Display:</strong> Percentage with 2 decimal places</p>
+    <p><strong>Breakdown Displayed:</strong></p>
+    <ul>
+        <li>Count of mature customers</li>
+        <li>Total customer count</li>
+    </ul>
+    <p><strong>Business Significance:</strong> Higher ratio means more reliable CLV projections</p>
+
+    <h3>9. Renewal Rate</h3>
+    <p><strong>Section:</strong> Clinical & Patient Success</p>
+    <p><strong>What it is:</strong> Percentage of mature customers who placed at least one paid renewal order after their prepaid period.</p>
+    <p><strong>What it means:</strong> Measures customer retention and satisfaction after the initial commitment period ends.</p>
+    <p><strong>Formula:</strong> <code>(Renewed Customers / Mature Customers) * 100</code></p>
+    <p><strong>Renewed Customer Definition:</strong> A mature customer who has at least one paid order (amount > 0) after their prepaid period</p>
+    <p><strong>Data Sources:</strong></p>
+    <ul>
+        <li><code>order.created</code> sheet (customer_id, total_amount, created_at, product_id)</li>
+        <li><code>products</code> sheet (sale_cycle_duration)</li>
+        <li><code>subscription.cancelled</code> sheet</li>
+        <li><code>subscription.paused</code> sheet</li>
+    </ul>
+    <p><strong>Display:</strong> Percentage with 2 decimal places, plus counts</p>
+    <p><strong>Quality Thresholds:</strong></p>
+    <ul>
+        <li>Excellent: ≥ 80%</li>
+        <li>Good: 60-79%</li>
+        <li>Needs Improvement: 40-59%</li>
+        <li>Low: < 40%</li>
+    </ul>
+    <p><strong>Business Significance:</strong> Critical retention metric; higher renewal rates indicate product-market fit and customer satisfaction</p>
+
+    <hr>
+
+    <h2 id="timed-metrics">Timed Metrics (Date Range Sensitive)</h2>
+    <p>These metrics are calculated based on the selected time period (daily, weekly, monthly, quarterly, annually, all-time, or custom range).</p>
+
+    <h3>10. New Patient Enrollments</h3>
+    <p><strong>Section:</strong> Growth & Revenue Metrics</p>
+    <p><strong>What it is:</strong> Count of unique customers whose first checkout order occurred in the selected date range.</p>
+    <p><strong>What it means:</strong> New customer acquisition for the period.</p>
+    <p><strong>Filter Criteria:</strong></p>
+    <ul>
+        <li><code>order.source = 'checkout'</code> (excludes renewal orders)</li>
+        <li>First order by customer</li>
+        <li>Order date within selected range</li>
+    </ul>
+    <p><strong>Formula:</strong> <code>Count(DISTINCT customer_id WHERE first_checkout_order.created_at BETWEEN startDate AND endDate)</code></p>
+    <p><strong>Data Sources:</strong> <code>order.created</code> sheet (customer_id, created_at, source)</p>
+    <p><strong>Quality Indicator:</strong> Good: > 0 new patients | Low: 0 new patients</p>
+    <p><strong>Business Significance:</strong> Primary growth indicator; tracks acquisition performance</p>
+
+    <h3>11. Geographic Reach</h3>
+    <p><strong>Section:</strong> Operations & Logistics Metrics</p>
+    <p><strong>What it is:</strong> Number of unique US states with orders in the selected date range.</p>
+    <p><strong>What it means:</strong> Market penetration and geographic distribution of the customer base.</p>
+    <p><strong>Formula:</strong> <code>COUNT(DISTINCT address.province_code WHERE order.created_at BETWEEN startDate AND endDate)</code></p>
+    <p><strong>Data Sources:</strong></p>
+    <ul>
+        <li><code>order.created</code> sheet (shipping_address_id, created_at)</li>
+        <li><code>addresses</code> sheet (address_id, province_code)</li>
+    </ul>
+    <p><strong>Join Condition:</strong> <code>order.shipping_address_id = address.address_id</code></p>
+    <p><strong>Display:</strong> Count of states + list of state codes</p>
+    <p><strong>Business Significance:</strong> Indicates market expansion and regulatory compliance scope</p>
+
+    <h3>12. Monthly Recurring Revenue (MRR)</h3>
+    <p><strong>Section:</strong> Growth & Revenue Metrics</p>
+    <p><strong>What it is:</strong> Normalized monthly revenue from all active subscriptions.</p>
+    <p><strong>What it means:</strong> Predictable recurring revenue stream; key metric for subscription businesses.</p>
+    <p><strong>Formula:</strong> <code>Sum((product.renewal_price * 30) / product.renewal_cycle_duration) FOR active subscriptions</code></p>
+    <p><strong>Normalization:</strong> All renewal cycles converted to 30-day months</p>
+    <p><strong>Data Sources:</strong></p>
+    <ul>
+        <li><code>subscription.active</code> sheet (Status, ProductID)</li>
+        <li><code>products</code> sheet (product_id, renewal_price, renewal_cycle_duration)</li>
+    </ul>
+    <p><strong>Filter:</strong> Only active subscriptions</p>
+    <p><strong>Display:</strong> Currency (USD) with 2 decimal places</p>
+    <p><strong>Business Significance:</strong> Core SaaS metric; indicates recurring revenue health</p>
+
+    <h3>13. Average Revenue Per User (ARPU)</h3>
+    <p><strong>Section:</strong> Growth & Revenue Metrics</p>
+    <p><strong>What it is:</strong> Average monthly revenue generated per customer.</p>
+    <p><strong>What it means:</strong> Revenue efficiency metric; shows how much each customer contributes monthly.</p>
+    <p><strong>Formula:</strong> <code>Average(customer.totalRevenue / customer.monthsActive) across all customers</code></p>
+    <p><strong>Months Active Calculation:</strong> <code>CEILING((lastOrderDate - firstOrderDate) / 30 days)</code> | Minimum: 1 month</p>
+    <p><strong>Data Sources:</strong> <code>order.created</code> sheet (customer_id, total_amount, created_at)</p>
+    <p><strong>Display:</strong> Currency (USD) with 2 decimal places</p>
+    <p><strong>Business Significance:</strong> Used in Predictive CLV calculation; indicates per-customer revenue potential</p>
+
+    <h3>14. Net Revenue After Refunds</h3>
+    <p><strong>Section:</strong> Financial Risk Metrics</p>
+    <p><strong>What it is:</strong> Total revenue minus total refunds.</p>
+    <p><strong>What it means:</strong> Actual realized revenue after accounting for returns and cancellations.</p>
+    <p><strong>Formula:</strong> <code>Sum(payment.amount) - Sum(refund.amount)</code></p>
+    <p><strong>Refund Rate Formula:</strong> <code>(Total Refunds / Total Payments) * 100</code></p>
+    <p><strong>Data Sources:</strong></p>
+    <ul>
+        <li><code>payment_succesful</code> sheet (amount)</li>
+        <li><code>refund.created</code> sheet (amount)</li>
+    </ul>
+    <p><strong>Display Components:</strong></p>
+    <ul>
+        <li>Net Revenue (USD)</li>
+        <li>Total Payments (USD)</li>
+        <li>Total Refunds (USD)</li>
+        <li>Refund Rate (%)</li>
+    </ul>
+    <p><strong>Business Significance:</strong> True revenue metric; high refund rates indicate product or service issues</p>
+
+    <h3>15. Payment Success Rate</h3>
+    <p><strong>Section:</strong> Financial Risk Metrics</p>
+    <p><strong>What it is:</strong> Percentage of payment attempts that succeeded.</p>
+    <p><strong>What it means:</strong> Payment processing reliability and customer payment method health.</p>
+    <p><strong>Formula:</strong> <code>(Successful Payments / Total Payment Attempts) * 100</code></p>
+    <p><strong>Successful Payment Criteria:</strong> <code>payment.amount > 0</code></p>
+    <p><strong>Data Sources:</strong> <code>payment_succesful</code> sheet (amount)</p>
+    <p><strong>Display:</strong> Percentage with 2 decimal places + counts</p>
+    <p><strong>Quality Thresholds:</strong></p>
+    <ul>
+        <li>Excellent: > 95%</li>
+        <li>Good: 90-95%</li>
+        <li>Needs Improvement: < 90%</li>
+    </ul>
+    <p><strong>Business Significance:</strong> Indicates payment infrastructure health; low rates suggest need for payment method updates or processor issues</p>
+
+    <h3>16. Churn Rate</h3>
+    <p><strong>Section:</strong> Clinical & Patient Success</p>
+    <p><strong>What it is:</strong> Percentage of subscriptions that were cancelled per month (based on last 90 days).</p>
+    <p><strong>What it means:</strong> Customer attrition rate; inverse of retention.</p>
+    <p><strong>Formula (90-day):</strong> <code>(Cancellations in last 90 days / Total Subscriptions) * (30 / 90) * 100</code></p>
+    <p><strong>Formula (Fallback):</strong> <code>(All Cancellations / Total Subscriptions) * 100</code></p>
+    <p><strong>90-Day Period:</strong> Used for more current churn rate estimate</p>
+    <p><strong>Data Sources:</strong></p>
+    <ul>
+        <li><code>subscription.active</code> sheet (Status)</li>
+        <li><code>subscription.cancelled</code> sheet (customer_id, last_updated)</li>
+    </ul>
+    <p><strong>Display Components:</strong></p>
+    <ul>
+        <li>Churn rate (%)</li>
+        <li>Active customer count</li>
+        <li>Cancelled customer count (90 days)</li>
+        <li>Methodology description</li>
+    </ul>
+    <p><strong>Quality Thresholds:</strong></p>
+    <ul>
+        <li>Excellent: < 5%</li>
+        <li>Good: 5-10%</li>
+        <li>Needs Improvement: > 10%</li>
+    </ul>
+    <p><strong>Business Significance:</strong> Critical retention metric; directly impacts CLV and long-term growth</p>
+
+    <h3>17. Predictive CLV</h3>
+    <p><strong>Section:</strong> Growth & Revenue Metrics</p>
+    <p><strong>What it is:</strong> Estimated total future lifetime value per customer.</p>
+    <p><strong>What it means:</strong> Projected total revenue from an average customer over their entire lifecycle.</p>
+    <p><strong>Formula:</strong> <code>ARPU / (Churn Rate / 100)</code></p>
+    <p><strong>Example:</strong></p>
+    <ul>
+        <li>If ARPU = $200/month</li>
+        <li>If Churn Rate = 5% per month (0.05)</li>
+        <li>Then Predictive CLV = $200 / 0.05 = $4,000</li>
+    </ul>
+    <p><strong>Prerequisites:</strong></p>
+    <ul>
+        <li>ARPU must be calculated</li>
+        <li>Churn Rate must be > 0</li>
+    </ul>
+    <p><strong>Display:</strong> Currency (USD) with 2 decimal places, plus formula breakdown</p>
+    <p><strong>Business Significance:</strong> Strategic metric for customer acquisition spend; indicates maximum acceptable CAC (Customer Acquisition Cost)</p>
+    <p><strong>Note:</strong> Returns null if churn rate is 0 (division by zero)</p>
+
+    <h3>18. Medication Adherence Rate</h3>
+    <p><strong>Section:</strong> Clinical & Patient Success</p>
+    <p><strong>What it is:</strong> Percentage of customers enrolled for 90+ days who remain active.</p>
+    <p><strong>What it means:</strong> Clinical success metric; measures patient compliance with treatment.</p>
+    <p><strong>Formula:</strong> <code>(Adherent Customers / Eligible Customers) * 100</code></p>
+    <p><strong>Eligible Customer:</strong> Subscription created 90+ days ago</p>
+    <p><strong>Adherent Customer:</strong> Active status OR completed 90+ days of treatment</p>
+    <p><strong>Clinical Target:</strong> 80% (industry standard)</p>
+    <p><strong>Data Sources:</strong> <code>subscription.active</code> sheet (Datetime Created, Status)</p>
+    <p><strong>Display Components:</strong></p>
+    <ul>
+        <li>Adherence rate (%)</li>
+        <li>Adherent customer count</li>
+        <li>Total eligible customer count</li>
+        <li>Clinical target (80%)</li>
+    </ul>
+    <p><strong>Quality Thresholds:</strong></p>
+    <ul>
+        <li>Excellent: ≥ 80%</li>
+        <li>Good: 70-79%</li>
+        <li>Needs Improvement: < 70%</li>
+    </ul>
+    <p><strong>Business Significance:</strong> Clinical effectiveness indicator; correlates with outcomes and retention</p>
+
+    <h3>19. Order Processing Efficiency</h3>
+    <p><strong>Section:</strong> Operations & Logistics Metrics</p>
+    <p><strong>What it is:</strong> Time between order creation and update (processing time).</p>
+    <p><strong>What it means:</strong> Operational speed; how quickly orders move through the system.</p>
+    <p><strong>Formula:</strong> <code>(order.updated_at - order.created_at) / 3600 seconds</code></p>
+    <p><strong>Metrics Reported:</strong></p>
+    <ul>
+        <li>Median processing time (50th percentile)</li>
+        <li>90th percentile processing time (P90)</li>
+        <li>Sample size (order count)</li>
+    </ul>
+    <p><strong>Time Filters:</strong> Only includes orders with 0-168 hour processing time (excludes outliers)</p>
+    <p><strong>Data Sources:</strong> <code>order.created</code> sheet (created_at, updated_at)</p>
+    <p><strong>Unit:</strong> Hours with 2 decimal places</p>
+    <p><strong>Quality Thresholds:</strong></p>
+    <ul>
+        <li>Excellent: Median < 24 hours</li>
+        <li>Good: Median 24-48 hours</li>
+        <li>Needs Improvement: Median > 48 hours</li>
+    </ul>
+    <p><strong>Business Significance:</strong> Operational efficiency indicator; faster processing improves customer satisfaction</p>
+
+    <h3>20. Product Performance</h3>
+    <p><strong>Section:</strong> Operations & Logistics Metrics</p>
+    <p><strong>What it is:</strong> Revenue and order metrics broken down by product.</p>
+    <p><strong>What it means:</strong> Identifies top-performing products and revenue drivers.</p>
+    <p><strong>Metrics Per Product:</strong></p>
+    <ul>
+        <li>Product name</li>
+        <li>Total order count</li>
+        <li>Active subscription count</li>
+        <li>Total revenue (USD)</li>
+        <li>Unique customer count</li>
+    </ul>
+    <p><strong>Data Sources:</strong></p>
+    <ul>
+        <li><code>products</code> sheet (product_id, name)</li>
+        <li><code>order.created</code> sheet (order_id, product_id, customer_id)</li>
+        <li><code>subscription.active</code> sheet (ProductID, Status)</li>
+        <li><code>payment_succesful</code> sheet (order_number, amount)</li>
+    </ul>
+    <p><strong>Join Logic:</strong></p>
+    <ul>
+        <li><code>order.product_id = product.product_id</code></li>
+        <li><code>subscription.ProductID = product.product_id</code></li>
+        <li><code>payment.order_number = order.order_id</code></li>
+    </ul>
+    <p><strong>Display:</strong> Top 5 products by revenue</p>
+    <p><strong>Business Significance:</strong> Product strategy; identifies which offerings drive revenue</p>
+
+    <hr>
+
+    <h2 id="data-quality">Data Quality Indicators</h2>
+
+    <h3>Quality Assessment</h3>
+    <p>The dashboard assesses data quality and displays it in metadata:</p>
+    <pre><code>function assessDataQuality(data) {
+  const quality = {
+    customers: data.customers.length,
+    orders: data.orders.length,
+    payments: data.payments.length,
+    subscriptions: data.subscriptions.length,
+    overall: 'good'
+  };
+
+  if (quality.customers < 10 || quality.orders < 10) {
+    quality.overall = 'low';
+  }
+
+  return quality;
+}</code></pre>
+    <p><strong>Thresholds:</strong></p>
+    <ul>
+        <li>Overall = 'low' if customers < 10 OR orders < 10</li>
+        <li>Overall = 'good' otherwise</li>
+    </ul>
+    <p><strong>Displayed In:</strong> Metadata section at bottom of dashboard</p>
+
+    <h3>Quality Levels by Metric</h3>
+    <p>Each KPI includes a quality indicator:</p>
+    <ul>
+        <li><strong>'excellent':</strong> Metric exceeds target thresholds</li>
+        <li><strong>'good':</strong> Metric meets baseline requirements</li>
+        <li><strong>'needs_improvement':</strong> Metric below targets but calculable</li>
+        <li><strong>'low':</strong> Insufficient data for reliable calculation</li>
+        <li><strong>'error':</strong> Calculation failed</li>
+        <li><strong>'no_data':</strong> No data available</li>
+    </ul>
+
+    <hr>
+
+    <h2>Time Period Calculations</h2>
+
+    <h3>Date Range Determination</h3>
+    <p><strong>Monthly (default):</strong></p>
+    <pre><code>startDate = new Date(now.getFullYear(), now.getMonth(), 1); // First day of current month
+endDate = new Date(now); // Today</code></pre>
+
+    <p><strong>Weekly:</strong></p>
+    <pre><code>startDate = new Date(now);
+startDate.setDate(now.getDate() - now.getDay()); // Start of current week (Sunday)
+startDate.setHours(0, 0, 0, 0);
+endDate = new Date(now);</code></pre>
+
+    <p><strong>Quarterly:</strong></p>
+    <pre><code>const quarterStart = Math.floor(now.getMonth() / 3) * 3; // 0, 3, 6, or 9
+startDate = new Date(now.getFullYear(), quarterStart, 1);
+endDate = new Date(now);</code></pre>
+
+    <p><strong>All Time:</strong></p>
+    <pre><code>startDate = new Date('2020-01-01');
+endDate = new Date(now);</code></pre>
+
+    <p><strong>Custom:</strong></p>
+    <pre><code>// User provides dates via date picker
+startDate = new Date(startDateISO);
+endDate = new Date(endDateISO);
+endDate.setHours(23, 59, 59, 999); // Include full end day</code></pre>
+
+    <hr>
+
+    <h2>Data Sources Reference</h2>
+
+    <h3>Spreadsheet Structure</h3>
+    <p><strong>Spreadsheet ID:</strong> <code>1PaCOgNJmKSb2VsJjCMjWpCG-gwrO7uVkuTAFUdrV-_o</code></p>
+
+    <h3>Sheet Names and Key Fields</h3>
+
+    <p><strong>customers:</strong></p>
+    <ul>
+        <li>customer_id</li>
+        <li>created_at</li>
+        <li>email</li>
+    </ul>
+
+    <p><strong>order.created:</strong></p>
+    <ul>
+        <li>order_id</li>
+        <li>customer_id</li>
+        <li>product_id</li>
+        <li>total_amount</li>
+        <li>created_at</li>
+        <li>updated_at</li>
+        <li>source ('checkout' or 'renewal')</li>
+        <li>shipping_address_id</li>
+    </ul>
+
+    <p><strong>payment_succesful:</strong></p>
+    <ul>
+        <li>order_number (joins to order.order_id)</li>
+        <li>amount</li>
+        <li>datetime</li>
+    </ul>
+
+    <p><strong>refund.created:</strong></p>
+    <ul>
+        <li>order_id</li>
+        <li>amount</li>
+        <li>datetime</li>
+    </ul>
+
+    <p><strong>products:</strong></p>
+    <ul>
+        <li>product_id</li>
+        <li>name</li>
+        <li>renewal_price</li>
+        <li>renewal_cycle_duration (days)</li>
+        <li>sale_cycle_duration (number of prepaid orders)</li>
+    </ul>
+
+    <p><strong>subscription.active:</strong></p>
+    <ul>
+        <li>CustomerID</li>
+        <li>ProductID</li>
+        <li>Status</li>
+        <li>Datetime Created</li>
+    </ul>
+
+    <p><strong>subscription.cancelled:</strong></p>
+    <ul>
+        <li>customer_id</li>
+        <li>last_updated</li>
+    </ul>
+
+    <p><strong>subscription.paused:</strong></p>
+    <ul>
+        <li>customer_id</li>
+        <li>last_updated</li>
+    </ul>
+
+    <p><strong>addresses:</strong></p>
+    <ul>
+        <li>address_id</li>
+        <li>province_code (US state)</li>
+    </ul>
+
+    <hr>
+
+    <h2>Calculation Performance</h2>
+
+    <h3>Caching Strategy</h3>
+    <ul>
+        <li>Cache duration: 6 minutes (360 seconds)</li>
+        <li>Cache key format: <code>enhanced_kpis_{timePeriod}_{startTime}_{endTime}</code></li>
+        <li>Cache service: Google Apps Script CacheService</li>
+    </ul>
+
+    <h3>Calculation Order</h3>
+    <ol>
+        <li>Load all data from sheets</li>
+        <li>Calculate CLV metrics (includes ARPU, Churn, Predictive CLV)</li>
+        <li>Calculate Renewal Rate</li>
+        <li>Calculate time-dependent metrics with date filtering</li>
+        <li>Assess data quality</li>
+        <li>Cache results</li>
+        <li>Return JSON to frontend</li>
+    </ol>
+
+    <hr>
+
+    <h2>Metadata Display</h2>
+    <p>At the bottom of the dashboard, the following metadata is shown:</p>
+    <ul>
+        <li><strong>Last Updated:</strong> Timestamp of KPI calculation</li>
+        <li><strong>Time Period:</strong> Selected time period (monthly, weekly, etc.)</li>
+        <li><strong>Data Points:</strong> Count of subscriptions, customers, and orders used in calculations</li>
+    </ul>
+
+    <hr>
+
+    <h2>Dashboard Sections</h2>
+    <p>The KPIs are organized into 5 main sections:</p>
+
+    <ol>
+        <li><strong>Growth & Revenue Metrics</strong> (📈)
+            <ul>
+                <li>New Patient Enrollments</li>
+                <li>Realized CLV (All)</li>
+                <li>Realized CLV (Mature)</li>
+                <li>Mature Customer Ratio</li>
+                <li>MRR</li>
+                <li>ARPU</li>
+                <li>Predictive CLV</li>
+            </ul>
+        </li>
+        <li><strong>Operations & Logistics Metrics</strong> (⚙️)
+            <ul>
+                <li>Geographic Reach</li>
+                <li>Order Processing Efficiency</li>
+                <li>Product Performance</li>
+            </ul>
+        </li>
+        <li><strong>Clinical & Patient Success Metrics</strong> (🏥)
+            <ul>
+                <li>Active Patients</li>
+                <li>Renewal Rate</li>
+                <li>Medication Adherence Rate</li>
+                <li>Churn Rate</li>
+            </ul>
+        </li>
+        <li><strong>Financial Risk Metrics</strong> (💰)
+            <ul>
+                <li>Net Revenue After Refunds</li>
+                <li>Payment Success Rate</li>
+            </ul>
+        </li>
+        <li><strong>Order Flow & Stage Analysis</strong> (🔄)
+            <ul>
+                <li>Order stage transition times</li>
+            </ul>
+        </li>
+    </ol>
+
+    <hr>
+
+    <h2>Pending KPIs (Placeholders)</h2>
+    <p>The following KPIs are displayed as placeholders awaiting data integration:</p>
+    <ol>
+        <li><strong>Customer Acquisition Cost (CAC)</strong> - Requires: Marketing cost data integration</li>
+        <li><strong>Cancelled Order/Refund Rate</strong> - Requires: Enhanced Stripe tracking</li>
+        <li><strong>Shipping SLA Compliance</strong> - Requires: Shipping provider API integration</li>
+        <li><strong>Support Ticket Metrics</strong> - Requires: Support system integration</li>
+        <li><strong>Average Weight Loss</strong> - Requires: Patient outcome data extraction</li>
+        <li><strong>Lead-to-Consult Conversion</strong> - Requires: Marketing funnel data integration</li>
+    </ol>
+
+    <hr>
+
+    <h2>Technical Notes</h2>
+
+    <h3>Google Apps Script Compatibility</h3>
+    <ul>
+        <li>All Date objects converted to ISO strings for transmission</li>
+        <li>Uses <code>google.script.run</code> for client-server communication</li>
+        <li>HIPAA compliance checks on every request</li>
+        <li>Audit logging for all dashboard access</li>
+    </ul>
+
+    <h3>Error Handling</h3>
+    <ul>
+        <li>Multiple fallback calculation methods</li>
+        <li>Minimal KPI structure returned on critical errors</li>
+        <li>Detailed error logging to console</li>
+        <li>User-friendly error messages displayed</li>
+    </ul>
+
+    <h3>Browser Compatibility</h3>
+    <ul>
+        <li>Supports all modern browsers</li>
+        <li>Mobile-responsive design</li>
+        <li>Works with Google Workspace authentication</li>
+    </ul>
+
+    <hr>
+
+    <h2>Version History</h2>
+    <p><strong>Version 1.0</strong> (2025-10-22)</p>
+    <ul>
+        <li>Initial comprehensive documentation</li>
+        <li>All 20+ KPIs documented with formulas</li>
+        <li>Data source mapping complete</li>
+        <li>Quality indicators defined</li>
+    </ul>
+
+    <hr>
+
+    <div class="metadata">
+        <h3>Contact & Support</h3>
+        <p>For questions about KPI calculations or dashboard access:</p>
+        <ul>
+            <li>Check Google Apps Script logs for detailed calculation traces</li>
+            <li>Review data quality indicators in dashboard metadata</li>
+            <li>Contact system administrator for data source issues</li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <p style="text-align: center; color: #7f8c8d; margin-top: 3em;">
+        <strong>End of Document</strong>
+    </p>
+
+</body>
+</html>

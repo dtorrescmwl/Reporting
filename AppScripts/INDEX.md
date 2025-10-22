@@ -2,6 +2,35 @@
 
 This directory contains all Google Apps Scripts organized by system and purpose.
 
+## 🚀 CLASP CLI Development Ready
+
+**NEW**: Edit Apps Scripts locally and deploy with command line tools!
+
+### CLASP-Enabled Scripts
+- **StripeTracking.js** ✅ **CLI READY**
+  - **Location**: `AppScripts/CarePortals/StripeTracking_clasp/`
+  - **Edit locally**: `src/Code.gs`
+  - **Deploy**: `cd AppScripts/CarePortals/StripeTracking_clasp && clasp push`
+  - **Web App**: https://script.google.com/macros/s/AKfycbxiwMYL8jlJtO7VXoqTBcnjSieWGEH0lhzRJvWxQGdBPg1ZAUaV8oivSYFfho45Sge_jA/exec
+
+### CLI Workflow
+```bash
+# 1. Setup (one-time)
+npm install -g @google/clasp
+clasp login
+
+# 2. Navigate to project
+cd AppScripts/CarePortals/StripeTracking_clasp
+
+# 3. Edit locally
+nano src/Code.gs
+
+# 4. Deploy changes
+clasp push
+```
+
+**Documentation**: See `/CLASP_CLI_SETUP_GUIDE.md` for complete instructions.
+
 ## 🏥 CarePortals Scripts
 
 ### customer_support_order_tracking.js
@@ -57,13 +86,30 @@ This directory contains all Google Apps Scripts organized by system and purpose.
 - **Spreadsheet**: Customer_Support
 - **Web App URL**: *TBD - Awaiting deployment*
 - **Trigger**: CarePortals message.inbound webhook
-- **Features**: 
+- **Features**:
   - Logs messages to messages.log tab in Customer_Support spreadsheet
   - Dual customer field support (customer and customer._id)
   - Customer name lookup from customer_dictionary tab
   - EMR Profile link generation
   - Eastern Time conversion for timestamps
   - Auto-creates messages.log tab with proper headers
+
+### StripeTracking.js ✅ CLI-READY + DEPLOYED
+- **Purpose**: Real-time Stripe payment and refund tracking via webhooks
+- **Spreadsheet**: Database_CarePortals (ID: 1PaCOgNJmKSb2VsJjCMjWpCG-gwrO7uVkuTAFUdrV-_o)
+- **Web App URL**: https://script.google.com/macros/s/AKfycbxiwMYL8jlJtO7VXoqTBcnjSieWGEH0lhzRJvWxQGdBPg1ZAUaV8oivSYFfho45Sge_jA/exec
+- **CLI Location**: `AppScripts/CarePortals/StripeTracking_clasp/src/Code.gs`
+- **Triggers**: Stripe webhooks (payment_intent.succeeded, refund.created)
+- **Features**:
+  - **Real-time Payment Tracking**: Captures successful payments to `payment_succesful` tab
+  - **Refund Processing**: Logs refunds to `refund.created` tab
+  - **Order Linking**: Uses `metadata.resourceId` to link payments to CarePortals orders
+  - **Eastern Time Conversion**: All timestamps converted from Unix to Eastern Time
+  - **Auto-sheet Creation**: Creates tabs with proper headers if they don't exist
+  - **Duplicate Prevention**: Checks for existing records before adding new ones
+  - **Application Fee Calculation**: Calculates 1% application fee for each payment
+  - **Payment Method Support**: Tracks payment methods, card details when available
+  - **Error Handling**: Comprehensive error logging and webhook response management
 
 ## 🔗 Embeddables Scripts
 

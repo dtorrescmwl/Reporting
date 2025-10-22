@@ -643,8 +643,8 @@
             // Populate Growth & Revenue KPIs
             populateKPISection('growth-revenue-kpis', data.growthRevenue);
 
-            // Populate Operations KPIs
-            populateKPISection('operations-kpis', data.operations);
+            // Populate Operations KPIs (with reversed order)
+            populateOperationsKPIs('operations-kpis', data.operations);
 
             // Populate Clinical KPIs
             populateKPISection('clinical-kpis', data.clinical);
@@ -667,6 +667,27 @@
                 const kpi = kpiData[key];
                 const card = createKPICard(kpi);
                 container.appendChild(card);
+            });
+        }
+
+        function populateOperationsKPIs(containerId, operationsData) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            // Define the desired logical order: 1,2,3,4 (process flow order)
+            const desiredOrder = [
+                'purchaseToAwaitingScript',            // Step 1: Purchase → Awaiting Script
+                'awaitingScriptToAwaitingShipment',    // Step 2: Awaiting Script → Awaiting Shipment
+                'awaitingShipmentToShipped',           // Step 3: Awaiting Shipment → Shipped
+                'purchaseToShipped'                    // Step 4: Purchase → Shipped (Total)
+            ];
+
+            desiredOrder.forEach(key => {
+                if (operationsData[key]) {
+                    const kpi = operationsData[key];
+                    const card = createKPICard(kpi);
+                    container.appendChild(card);
+                }
             });
         }
 
